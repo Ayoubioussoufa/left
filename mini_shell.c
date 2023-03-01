@@ -190,6 +190,7 @@ void	mini_shell(char **env)
 		{
 			read = parse_read(read);
 			shell = parse_line(read, env);
+			// ft_execute(shell, env);
 			execute(shell, &env);
 		}
 		else if (read[0])

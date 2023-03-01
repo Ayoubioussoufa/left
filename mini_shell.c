@@ -15,8 +15,8 @@ void	print_data(t_shell *shell)
 		{
 			if (shell->redir->type == INFILE)
 				printf("infile : %s\n", shell->redir->infile);
-			if (shell->redir->type == OUFILE)
-				printf("OUFILE : %s\n", shell->redir->outfile);
+			if (shell->redir->type == OUTFILE)
+				printf("OUTFILE : %s\n", shell->redir->outfile);
 			if (shell->redir->type == APPEND)
 				printf("APPEND : %s\n", shell->redir->outfile);
 			if (shell->redir->type == DELIMITER)
@@ -89,7 +89,7 @@ t_shell	*ft_lstnew(char *content, int index, char **env, int	pipe)
 		else
 			split[i] = get_value(split[i], env);
 		if(!ft_strcmp(split[i], ">"))
-			redi_add_back(&new->redir, new_redir(split[++i], OUFILE));
+			redi_add_back(&new->redir, new_redir(split[++i], OUTFILE));
 		else if(!ft_strcmp(split[i], "<"))
 			redi_add_back(&new->redir, new_redir(split[++i], INFILE));
 		else if(!ft_strcmp(split[i], "<<"))
@@ -178,6 +178,7 @@ void	mini_shell(char **env)
 {
 	char *read;
 	t_shell *shell;
+
 	while (1)
 	{
 		read = readline("\033[0;32mMinishell>> \033[0m");
@@ -189,7 +190,6 @@ void	mini_shell(char **env)
 		{
 			read = parse_read(read);
 			shell = parse_line(read, env);
-			// print_data(shell);
 			execute(shell, &env);
 		}
 		else if (read[0])

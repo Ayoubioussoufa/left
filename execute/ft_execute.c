@@ -6,97 +6,101 @@
 /*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 18:28:01 by aybiouss          #+#    #+#             */
-/*   Updated: 2023/02/28 17:44:58 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/01 11:59:07 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "../mini_shell.h"
 
-// void	error(char *str, int n)
-// {
-// 	if (str)
-// 	{
-// 		ft_putstr_fd(strerror(n), 2);
-// 		ft_putstr_fd(": ", 2);
-// 		ft_putstr_fd(str, 2);
-// 		ft_putstr_fd("\n", 2);
-// 	}
-// 	exit(n);
-// }
+void	error(char *str, int n)
+{
+	if (str)
+	{
+		ft_putstr_fd(strerror(n), 2);
+		ft_putstr_fd(": ", 2);
+		ft_putstr_fd(str, 2);
+		ft_putstr_fd("\n", 2);
+	}
+	exit(n);
+}
 
-// char	*get_cmd(char **paths, char *cmd)
-// {
-// 	int		i;
-// 	char	*tmp;
-// 	char	*path;
+char	*get_cmd(char **paths, char *cmd)
+{
+	int		i;
+	char	*tmp;
+	char	*path;
 
-// 	if (ft_strchr(cmd, '/'))
-// 		return (cmd);
-// 	i = 0;
-// 	while (paths[i])
-// 	{
-// 		tmp = ft_strjoin(paths[i], "/");
-// 		path = ft_strjoin(tmp, cmd);
-// 		free(tmp);
-// 		if (access(path, F_OK) == 0)
-// 			return (path);
-// 		free(path);
-// 		i++;
-// 	}
-// 	return (NULL);
-// }
+	if (ft_strchr(cmd, '/'))
+		return (cmd);
+	i = 0;
+	while (paths[i])
+	{
+		tmp = ft_strjoin(paths[i], "/");
+		path = ft_strjoin(tmp, cmd);
+		free(tmp);
+		if (access(path, F_OK) == 0)
+			return (path);
+		free(path);
+		i++;
+	}
+	return (NULL);
+}
 
-// char	**get_paths(char **env, t_shell *shell)
-// {
-// 	char	**paths;
-// 	int		i;
+char	**get_paths(char **env, t_shell *shell)
+{
+	char	**paths;
+	int		i;
 
-// 	i = 0;
-// 	while (env[i])
-// 	{
-// 		if (ft_strnstr(env[i], "PATH", 4))
-// 		{
-// 			paths = ft_split(env[i] + 5, ':');
-// 			if (!paths)
-// 				error("Split function failed", 1);
-// 			return (paths);
-// 		}
-// 		i++;
-// 	}
-// 	ft_putstr_fd("Command not found: ", 2);
-// 	ft_putstr_fd(shell->cmd, 2);
-// 	ft_putstr_fd("\n", 2);
-// 	exit(127);
-// 	return (NULL);
-// }
+	i = 0;
+	while (env[i])
+	{
+		if (ft_strnstr(env[i], "PATH", 4))
+		{
+			paths = ft_split(env[i] + 5, ':');
+			if (!paths)
+				error("Split function failed", 1);
+			return (paths);
+		}
+		i++;
+	}
+	ft_putstr_fd("Command not found: ", 2);
+	ft_putstr_fd(*shell->cmds, 2);
+	ft_putstr_fd("\n", 2);
+	exit(127);
+	return (NULL);
+}
 
-// void	ft_execute(t_shell *shell, char **env)
-// {
-// 	pid_t	pid;
-// 	int	ret = 0;
-// 	// (void)env;
-// 	pid = fork();
-// 	// int i = ft_lstsize(shell);
-// 	// while (shell)
-// 	// {
-// 	// 	printf("%s \t %d\n", shell->cmd, shell->type);
-// 	// 	shell = shell->next;
-// 	// }
-// 	// printf("%d\n", i);
-// 	if (pid == 0)
-// 	{
-// 		shell->cmds = ft_split(shell->cmd, ' '); //split the given commands
-// 		// printf("%s\n", shell->cmds[0]);
-// 		// printf("%s\n", shell->cmds[0] + 1);
-// 		shell->paths = get_paths(env, shell); //get all paths
-// 		shell->argv = get_cmd(shell->paths, shell->cmds[0]); // join the path with the command
-// 		if (execve(shell->argv, shell->cmds, env) == -1) //execute the cmd in the given env
-// 			error(NULL, errno);
-// 	}
-// 	else
-// 		waitpid(-1, &ret, 0);
-// }
+void	ft_execute(t_shell *shell, char **env)
+{
+	pid_t	pid;
+	char	**paths;
+	int	fd[2];
+	char	*argv;
+	int	ret = 0;
+	// (void)env;
+	pipe(fd);
+	pid = fork();
+	// int i = ft_lstsize(shell);
+	// while (shell)
+	// {
+	// 	printf("%s \t %d\n", shell->cmd, shell->type);
+	// 	shell = shell->next;
+	// }
+	// printf("%d\n", i);
+	if (pid == 0)
+	{
+		// shell->cmds = ft_split(shell->cmd, ' '); //split the given commands
+		// printf("%s\n", shell->cmds[0]);
+		// printf("%s\n", shell->cmds[0] + 1);
+		paths = get_paths(env, shell); //get all paths
+		argv = get_cmd(paths, shell->cmds[0]); // join the path with the command
+		if (execve(argv, shell->cmds, env) == -1) //execute the cmd in the given env
+			error(NULL, errno);
+	}
+	else
+		waitpid(-1, &ret, 0);
+}
 
 // void	checktype(t_shell *shell, char **env)
 // {
@@ -388,82 +392,83 @@ void	ft_which_cmd(char **cmd, char ***env)
 		echo_builtin(cmd);
 }
 
-// void	exec_redir_in(t_shell *tmp, int *in)
-// {
-// 	if (access(tmp->cmd, F_OK) == 0)
-// 	{
-// 		close(*in);
-// 		*in = open(tmp->cmd, O_RDONLY, 0666);
-// 	}
-// 	else
-// 	{
-// 		*in = -1;
-// 		write(2, "minishell: ", 11);
-// 		ft_perror(tmp->cmd, ": No such file or directory");
-// 	}
-// }
-
-// void	exec_redir(t_shell *shell)
-// {
-// 	t_shell	*tmp;
-
-// 	tmp = shell->head;
-// 	while (tmp)
-// 	{
-// 		if (tmp->type == REDIR_IN)
-// 			exec_redir_in(tmp, &fd->in);
-// 		else if (tmp->type == REDIR_OUT)
-// 		{
-// 			close(fd->out);
-// 			fd->out = open(tmp->arg, O_WRONLY | O_CREAT | O_TRUNC, 0666);
-// 		}
-// 		else if (tmp->type == DREDIR_OUT)
-// 		{
-// 			close(fd->out);
-// 			fd->out = open(tmp->arg, O_WRONLY | O_CREAT | O_APPEND, 0666);
-// 		}
-// 		else if (tmp->type == HERE_DOC)
-// 		{
-// 			close(fd->in);
-// 			fd->in = open(tmp->arg, O_RDONLY, 0666);
-// 		}
-// 		tmp = tmp->next;
-// 	}
-// }
-
-// void	check_fd_builtins(t_cmd *cmd)
-// {
-// 	if (cmd->fd.in != 0)
-// 	{
-// 		dup2(cmd->fd.in, STDIN_FILENO);
-// 		close(cmd->fd.in);
-// 	}
-// 	if (cmd->fd.out != 1)
-// 	{
-// 		dup2(cmd->fd.out, STDOUT_FILENO);
-// 		close(cmd->fd.out);
-// 	}
-// }
-
-void	execute_builtin(char **cmd, char **env)
+void	exec_redir_in(char *infile, int *in)
 {
-	// int	in;
-	// int	out;
+	if (access(infile, F_OK) == 0)
+	{
+		close(*in);
+		*in = open(infile, O_RDONLY, 0666);
+	}
+	else
+	{
+		*in = -1;
+		write(2, "minishell: ", 11);
+		ft_perror(infile, ": No such file or directory");
+	}
+}
 
-	// in = dup(STDIN_FILENO);
-	// out = dup(STDOUT_FILENO);
+void	exec_redir(t_shell *shell, t_fd *fd)
+{
+	t_redire	*tmp;
+
+	tmp = shell->redir;
+	while (tmp)
+	{
+		if (tmp->type == INFILE)
+			exec_redir_in(tmp->infile, &fd->in);
+		else if (tmp->type == OUTFILE)
+		{
+			close(fd->out);
+			fd->out = open(tmp->outfile, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+		}
+		else if (tmp->type == APPEND)
+		{
+			close(fd->out);
+			fd->out = open(tmp->outfile, O_WRONLY | O_CREAT | O_APPEND, 0666);
+		}
+		else if (tmp->type == DELIMITER)
+		{
+			close(fd->in);
+			fd->in = open(tmp->delimiter, O_RDONLY, 0666);
+		}
+		tmp = tmp->next;
+	}
+}
+
+void	check_fd_builtins(t_cmd *cmd)
+{
+	if (cmd->fd.in != 0)
+	{
+		dup2(cmd->fd.in, STDIN_FILENO);
+		close(cmd->fd.in);
+	}
+	if (cmd->fd.out != 1)
+	{
+		dup2(cmd->fd.out, STDOUT_FILENO);
+		close(cmd->fd.out);
+	}
+}
+
+void	execute_builtin(t_shell *shell, char **env, t_fd *fd)
+{
+	int	in;
+	int	out;
+
+	in = dup(STDIN_FILENO);
+	out = dup(STDOUT_FILENO);
+	exec_redir(shell, fd);
 	// if (fd.in == -1)
 	// {
 	// 	//status = 1;
 	// 	return ;
 	// }
-	// check_fd_builtins(cmd);
-	ft_which_cmd(cmd, &env);
+	check_fd_builtins(shell->cmd);
+	ft_which_cmd(shell->cmds, &env);
 	// dup2(in, STDIN_FILENO);
 	// dup2(out, STDOUT_FILENO);
 }
 
-int	exec_builtins_execve(t_shell *shell, char ***env)
+int	exec_builtins_execve(t_shell *shell, char ***env, t_fd *fd)
 {
 	// int	pid;
 
@@ -471,21 +476,24 @@ int	exec_builtins_execve(t_shell *shell, char ***env)
 	// (void)fd;
 	// (void)env;
 	if (check_builtins(shell->cmds[0]) == 1)
-		execute_builtin(shell->cmds, *env);
-		// execute_builtins();
-	// else
-	// 	pid = execute_cmd();
+		execute_builtin(shell, *env, fd);
+	else
+	{
+		printf("hhhhhh\n");
+		ft_execute(shell, *env);
+	}
 	return (0);
 }
 
 void	execute(t_shell *shell, char ***env)
 {
-	// int		fd[2];
+	t_fd	*fd;
 
+	fd = malloc(sizeof(t_fd));
 	printf("%s\n", shell->cmds[0]);
 	printf("%d\n", shell->type);
 	if (shell->type == CMD)
-		exec_builtins_execve(shell, env);
+		exec_builtins_execve(shell, env, fd);
 }
 
 // void	checkingcmd(t_shell *shell, char **env)

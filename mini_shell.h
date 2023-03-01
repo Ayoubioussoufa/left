@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   mini_shell.h                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sben-ela <sben-ela@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 17:36:00 by sben-ela          #+#    #+#             */
-/*   Updated: 2023/02/28 16:18:22 by sben-ela         ###   ########.fr       */
+/*   Updated: 2023/03/01 11:56:42 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #define		PIPE 2
 #define		STRING 3
 #define		INFILE 0
-#define		OUFILE 1
+#define		OUTFILE 1
 #define		APPEND 5
 #define		DELIMITER 4
 #define		CMD 3
@@ -46,6 +46,12 @@ typedef struct s_env
 	int			size;
 }	t_env;
 
+typedef struct s_fd
+{
+	int	in;
+	int	out;
+}	t_fd;
+
 typedef struct redire
 {
 	int		type;
@@ -58,18 +64,9 @@ typedef struct redire
 typedef	struct cmd
 {
 	char		*cmd;
+	t_fd		fd;
 	struct cmd	*next;
 }	t_cmd;
-
-typedef struct data
-{
-	int			index;
-	int			type;
-	t_cmd		*cmds;
-	t_redire	*redir;
-	int			pipe;
-	struct data	*next;
-}	t_data;
 
 typedef	struct	shell
 {
@@ -82,6 +79,7 @@ typedef	struct	shell
 	struct shell	*previous;
 	int				index;
 }	t_shell;
+
 char **full_cmds(t_cmd *cmd);
 int	cmd_size(t_cmd *cmds);
 void	execute(t_shell *shell, char ***env);
@@ -107,10 +105,6 @@ char	*ft_strdup(char *str);
 char	*ft_substr(char *s, int start, int len);
 // char	*ft_substr(char const *s, unsigned int start, size_t len);
 // char	*ft_strdup(const char *source);
-t_data	*full_data(t_shell *shell);
-t_data	*lst_new(t_cmd *content, int index);
-void	data_add_back(t_data **lst, t_data *new);
-t_data	*datalast(t_data *lst);
 void	redi_add_back(t_redire **lst, t_redire *new);
 t_redire	*redilast(t_redire *lst);
 t_redire	*new_redir(char *content, int type);

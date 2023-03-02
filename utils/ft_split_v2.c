@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split_v2.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aybiouss <aybiouss@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/20 10:05:16 by sben-ela          #+#    #+#             */
-/*   Updated: 2023/03/02 10:18:55 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/02 14:20:17 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,14 @@ int	ft_lenword(char const *str, char c)
 			i++;
 			while(str[i] && str[i] != '"')
 				i++;
+			i++;
 		}
 		if(str[i] == '\'')
 		{
 			i++;
 			while(str[i] && str[i] != '\'')
 				i++;
+			i++;
 		}
 		i++;
 	}
@@ -109,18 +111,18 @@ int	ft_count(const char *str, char c)
 
 	i = 0;
 	count = 1;
-	while(str[i])
+	while (str[i])
 	{
-		if(str[i] == c)
+		if (str[i] == c)
 		{
-			while(str[i] == c)
+			while (str[i] == c)
 				i++;
 			count++;
 		}
-		if(str[i] == '\'' || str[i] == '\"')
+		if (str[i] == '\'' || str[i] == '\"')
 		{
 			n = str[i++];
-			while(str[i] && str[i] != n)
+			while (str[i] && str[i] != n)
 				i++;
 		}
 		i++;
@@ -132,10 +134,8 @@ char	**ft_split_v2(char const *str, char c)
 {
 	char	**strs;
 	int		count;
-	// int		i;
 
 	count = 1;
-	// i = 0;
 	if (!str)
 		return (0);
 	count = ft_count(str, c);

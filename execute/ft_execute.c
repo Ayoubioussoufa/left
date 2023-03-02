@@ -3,28 +3,43 @@
 /*                                                        :::      ::::::::   */
 /*   ft_execute.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aybiouss <aybiouss@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 18:28:01 by aybiouss          #+#    #+#             */
-/*   Updated: 2023/03/02 10:25:37 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/02 17:10:20 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "../mini_shell.h"
 
-void	exec_redir_in(char *infile, int *in)
+void	free_paths(char **paths)
+{
+	int	i;
+
+	i = 0;
+	while (paths[i])
+	{
+		free(paths[i]);
+		i++;
+	}
+	free(paths);
+}
+
+int	exec_redir_in(char *infile, int *in)
 {
 	if (access(infile, F_OK) == 0)
 	{
 		close(*in);
 		*in = open(infile, O_RDONLY, 0666);
+		return (1);
 	}
 	else
 	{
 		*in = -1;
 		write(2, "minishell: ", 11);
 		ft_perror(infile, ": No such file or directory");
+		return (0);
 	}
 }
 
@@ -133,6 +148,7 @@ void	ft_execute(t_shell *shell, char **env)
 	pid_t	pid;
 	char	**paths = NULL;
 	char	*argv = NULL;
+	int	success;
 
 	pid = fork();
 	if (pid == -1)
@@ -141,13 +157,23 @@ void	ft_execute(t_shell *shell, char **env)
 	{
 		if (shell->redir)
 		{
-			exec_redir(shell->redir, &shell->cmd->fd);
-			if (shell->cmd->fd.in == -1)
+			success = exec_redir_in(shell->redir->infile, &shell->cmd->fd.in);
+			if (!success)
 				exit(1);
+			exec_redir(shell->redir, &shell->cmd->fd);
 		}
 		check_fd_builtins(shell->cmd);
 		paths = get_paths(env, shell);
 		argv = get_cmd(paths, shell->cmds[0]);
+		if (!argv)
+		{
+			free_paths(paths);
+			ft_putstr_fd("Minishell: ", 2);
+			ft_putstr_fd(ft_strtrim(shell->cmds[0], "\""), 2);
+			ft_putstr_fd(": Command not found", 2);
+			ft_putstr_fd("\n", 2);
+			exit(127);
+		}
 		if (execve(argv, shell->cmds, env) == -1)
 			error(NULL, errno);
 	}
@@ -155,6 +181,7 @@ void	ft_execute(t_shell *shell, char **env)
 		close(shell->cmd->fd.in);
 	if (shell->cmd->fd.out != 1)
 		close(shell->cmd->fd.out);
+	waitpid(pid, NULL, 0);
 }
 
 int	check_builtins(char *cmd)
@@ -214,6 +241,19 @@ void	execute_builtin(t_shell *shell, char ***env)
 	dup2(out, STDOUT_FILENO);
 }
 
+int	ft_lstsize(t_shell *lst)
+{
+	int	size;
+
+	size = 0;
+	while (lst != NULL)
+	{
+		size++;
+		lst = lst->next;
+	}
+	return (size);
+}
+
 int	exec_builtins_execve(t_shell *shell, char ***env)
 {
 	if (check_builtins(shell->cmds[0]) == 1)
@@ -225,8 +265,17 @@ int	exec_builtins_execve(t_shell *shell, char ***env)
 
 void	execute(t_shell *shell, char ***env)
 {
-	shell->cmd->fd.in = 0;
-	shell->cmd->fd.out = 1;
-	if (shell->type == CMD)
+	// int	fd[2];
+
+	if (ft_lstsize(shell) == 1)
 		exec_builtins_execve(shell, env);
+	else
+	{
+		;
+	}
 }
+
+/* else
+{
+	printf("lol abchwia tsna\n");
+}*/

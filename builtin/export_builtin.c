@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   export_builtin.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aybiouss <aybiouss@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 13:40:06 by aybiouss          #+#    #+#             */
-/*   Updated: 2023/02/23 11:43:16 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/02 13:58:12 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,6 +117,21 @@ void	add_var(t_env *env, char *cmd)
 		add_env_elem(env, new_env_elem(cmd)); //still dk why it doesnt add up
 }
 
+int	check_alpha(char *cmd)
+{
+	int	i;
+
+	i = 1;
+	while (cmd[i])
+	{
+		if (ft_isalnum(cmd[i]) || cmd[i] == '_')
+			i++;
+		else
+			return (0);
+	}
+	return (1);
+}
+
 int	export_builtin(char **cmd, char ***ev)
 {
 	t_env	*env;
@@ -131,7 +146,10 @@ int	export_builtin(char **cmd, char ***ev)
 	{
 		while (cmd[i])
 		{
-			if (!ft_isalpha(cmd[i][0]))
+			if (!ft_isalpha(cmd[i][0]) && cmd[i][0] != '_')
+				return (ft_puterr(cmd[0],
+					cmd[i], "not a valid identifier", EXIT_FAILURE));
+			if (!check_alpha(cmd[i]))
 				return (ft_puterr(cmd[0],
 					cmd[i], "not a valid identifier", EXIT_FAILURE));
 			add_var(env, cmd[i]);

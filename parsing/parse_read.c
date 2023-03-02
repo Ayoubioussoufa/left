@@ -19,14 +19,15 @@ int	handledel(char *line, int i, char c)
 
 char *parse_read(char *read)
 {
-    char 	*line;
-    int   	i;
+    char	*line;
+    int		i;
 	int		j;
 
-	j = 0;
-    i = 0;
+	i = j = 0;
     line = malloc(ft_strlen(read) + 1 + (count_redirect(read) * 2));
-    while(read[j])
+	if (!line)
+		return (0);
+    while (read[j])
     {
         if (read[j] == '<' && read[j + 1] == '<')
 		{
@@ -38,13 +39,11 @@ char *parse_read(char *read)
 			i = handleread(line, i, '>');
 			j += 2;
 		}
-		else if(read[j] == '<')
+		else if (read[j] == '<')
 			i = handledel(line, i, '<'),j++;
 		else if (read[j] == '>')
-		{
 			i = handledel(line, i, '>'),j++;
-			line[i] = read[j];
-		}
+		line[i] = read[j];
 		i++;
 		j++;
     }

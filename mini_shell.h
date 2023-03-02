@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   mini_shell.h                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aybiouss <aybiouss@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 17:36:00 by sben-ela          #+#    #+#             */
-/*   Updated: 2023/03/02 10:23:53 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/02 16:40:20 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,8 +157,10 @@ int        ft_isalnum(int c);
 char    *ft_strnstr(const char *haystack, const char *needle, size_t len);
 char    *ft_strdup(char *source);
 int handle_pipes(char *line);
-
+char	*ft_strtrimfree(char *s1, char *set);
 char	*ft_strtrim(char *s1, char *set);
+void    freedouble(char **args);
+
 // builtin cd
 int	cd_builtin(char **cmd, char ***env);
 void	set_dir(t_env *ev, char *cwd, char *owd);

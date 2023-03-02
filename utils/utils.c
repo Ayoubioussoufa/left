@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sben-ela <sben-ela@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/22 15:14:26 by aybiouss          #+#    #+#             */
-/*   Updated: 2023/02/28 16:24:07 by sben-ela         ###   ########.fr       */
+/*   Updated: 2023/03/02 14:08:59 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@ t_cmd	*new_cmd(char *content)
 	if(!new)
 		return (0);
 	new->cmd = content;
+	new->fd.in = 0;
+	new->fd.out = 1;
 	new->next = NULL;
 	return (new);
 }

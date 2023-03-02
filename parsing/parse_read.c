@@ -40,9 +40,11 @@ char *parse_read(char *read)
 		}
 		else if(read[j] == '<')
 			i = handledel(line, i, '<'),j++;
-		else if(read[j] == '>')
+		else if (read[j] == '>')
+		{
 			i = handledel(line, i, '>'),j++;
 			line[i] = read[j];
+		}
 		i++;
 		j++;
     }

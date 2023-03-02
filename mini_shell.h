@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   mini_shell.h                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aybiouss <aybiouss@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 17:36:00 by sben-ela          #+#    #+#             */
-/*   Updated: 2023/03/01 15:35:06 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/02 10:23:53 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,8 +85,8 @@ int	cmd_size(t_cmd *cmds);
 void	execute(t_shell *shell, char ***env);
 char	*ft_strchrr(const char *s, int c);
 char	**ft_split(char const *str, char c);
-// void    ft_execute(t_shell *shell, char **env);
-void    ft_execute(t_shell *shell, char **env, t_fd *fd);
+void    ft_execute(t_shell *shell, char **env);
+// void    ft_execute(t_shell *shell, char **env,t_fd *fd);
 void	whatever(t_shell *shell, char **env);
 char	*parse_redirect(char *line);
 //utils

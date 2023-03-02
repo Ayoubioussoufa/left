@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split_v2.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sben-ela <sben-ela@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aybiouss <aybiouss@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/20 10:05:16 by sben-ela          #+#    #+#             */
-/*   Updated: 2023/02/26 10:26:32 by sben-ela         ###   ########.fr       */
+/*   Updated: 2023/03/02 10:18:55 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,10 +132,10 @@ char	**ft_split_v2(char const *str, char c)
 {
 	char	**strs;
 	int		count;
-	int		i;
+	// int		i;
 
 	count = 1;
-	i = 0;
+	// i = 0;
 	if (!str)
 		return (0);
 	count = ft_count(str, c);

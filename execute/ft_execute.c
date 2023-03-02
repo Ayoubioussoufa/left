@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_execute.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aybiouss <aybiouss@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 18:28:01 by aybiouss          #+#    #+#             */
-/*   Updated: 2023/03/01 15:35:45 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/02 10:25:37 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,11 +28,11 @@ void	exec_redir_in(char *infile, int *in)
 	}
 }
 
-void	exec_redir(t_shell *shell, t_fd *fd)
+void	exec_redir(t_redire *redir, t_fd *fd)
 {
 	t_redire	*tmp;
 
-	tmp = shell->redir;
+	tmp = redir;
 	while (tmp)
 	{
 		if (tmp->type == INFILE)
@@ -128,30 +128,33 @@ char	**get_paths(char **env, t_shell *shell)
 	return (NULL);
 }
 
-void	ft_execute(t_shell *shell, char **env, t_fd *fd)
+void	ft_execute(t_shell *shell, char **env)
 {
 	pid_t	pid;
 	char	**paths = NULL;
 	char	*argv = NULL;
-	int	ret = 0;
 
-	exec_redir(shell, fd);
-	check_fd_builtins(shell->cmd);
 	pid = fork();
-	if (pid == 0)
+	if (pid == -1)
+		return ;
+	else if (pid == 0)
 	{
+		if (shell->redir)
+		{
+			exec_redir(shell->redir, &shell->cmd->fd);
+			if (shell->cmd->fd.in == -1)
+				exit(1);
+		}
+		check_fd_builtins(shell->cmd);
 		paths = get_paths(env, shell);
 		argv = get_cmd(paths, shell->cmds[0]);
-		// printf("%s\n", argv);
 		if (execve(argv, shell->cmds, env) == -1)
 			error(NULL, errno);
 	}
-	else
-	{
-		close(fd->in);
-		close(fd->out);
-		waitpid(-1, &ret, 0);
-	}
+	if (shell->cmd->fd.in != 0)
+		close(shell->cmd->fd.in);
+	if (shell->cmd->fd.out != 1)
+		close(shell->cmd->fd.out);
 }
 
 int	check_builtins(char *cmd)
@@ -191,36 +194,39 @@ void	ft_which_cmd(char **cmd, char ***env)
 		echo_builtin(cmd);
 }
 
-void	execute_builtin(t_shell *shell, char **env, t_fd *fd)
+void	execute_builtin(t_shell *shell, char ***env)
 {
-	fd->in = dup(STDIN_FILENO);
-	fd->out = dup(STDOUT_FILENO);
-	exec_redir(shell, fd);
-	// if (fd.in == -1)
-	// {
-	// 	//status = 1;
-	// 	return ;
-	// }
+	int	in;
+	int	out;
+
+	in = dup(STDIN_FILENO);
+	out = dup(STDOUT_FILENO);
+	if (shell->redir)
+		exec_redir(shell->redir, &shell->cmd->fd);
+	if (shell->cmd->fd.in == -1)
+	{
+		//status = 1;
+		return ;
+	}
 	check_fd_builtins(shell->cmd);
-	ft_which_cmd(shell->cmds, &env);
-	dup2(fd->in, STDIN_FILENO);
-	dup2(fd->out, STDOUT_FILENO);
+	ft_which_cmd(shell->cmds, env);
+	dup2(in, STDIN_FILENO);
+	dup2(out, STDOUT_FILENO);
 }
 
-int	exec_builtins_execve(t_shell *shell, char ***env, t_fd *fd)
+int	exec_builtins_execve(t_shell *shell, char ***env)
 {
 	if (check_builtins(shell->cmds[0]) == 1)
-		execute_builtin(shell, *env, fd);
+		execute_builtin(shell, env);
 	else
-		ft_execute(shell, *env, fd);
+		ft_execute(shell, *env);
 	return (0);
 }
 
 void	execute(t_shell *shell, char ***env)
 {
-	t_fd	*fd;
-
-	fd = malloc(sizeof(t_fd));
+	shell->cmd->fd.in = 0;
+	shell->cmd->fd.out = 1;
 	if (shell->type == CMD)
-		exec_builtins_execve(shell, env, fd);
+		exec_builtins_execve(shell, env);
 }

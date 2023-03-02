@@ -19,10 +19,8 @@ void	ft_putchar(char c)
 
 void	ft_putstr(char *s)
 {
-	int	i;
 	int	len;
 
-	i = 0;
 	if (!s)
 	{
 		printf("0");

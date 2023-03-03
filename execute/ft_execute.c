@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_execute.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aybiouss <aybiouss@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 18:28:01 by aybiouss          #+#    #+#             */
-/*   Updated: 2023/03/03 10:15:43 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/03 14:06:45 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,10 @@ void	free_paths(char **paths)
 
 int	exec_redir_in(char *infile, int *in)
 {
-	if (access(infile, F_OK) == 0)
+	if (access(infile, X_OK) == 0)
 	{
 		close(*in);
-		*in = open(infile, O_RDONLY, 0666);
+		*in = open(infile, O_RDONLY, 0666); //protection;
 		return (1);
 	}
 	else
@@ -65,20 +65,20 @@ void	exec_redir(t_redire *redir, t_fd *fd)
 		else if (tmp->type == DELIMITER)
 		{
 			close(fd->in);
-			fd->in = open(tmp->delimiter, O_RDONLY, 0666);
+			fd->in = open(tmp->delimiter, O_RDONLY, 0666); //protection
 		}
 		tmp = tmp->next;
 	}
 }
 
-void	check_fd_builtins(t_cmd *cmd)
+void	check_fd(t_cmd *cmd)
 {
 	if (cmd->fd.in != 0)
 	{
 		dup2(cmd->fd.in, STDIN_FILENO);
 		close(cmd->fd.in);
 	}
-	if (cmd->fd.out != 1)
+	if (cmd->fd.out != 0)
 	{
 		dup2(cmd->fd.out, STDOUT_FILENO);
 		close(cmd->fd.out);
@@ -162,7 +162,7 @@ void	ft_execute(t_shell *shell, char **env)
 				exit(1);
 			exec_redir(shell->redir, &shell->cmd->fd);
 		}
-		check_fd_builtins(shell->cmd);
+		check_fd(shell->cmd);
 		paths = get_paths(env, shell);
 		argv = get_cmd(paths, shell->cmds[0]);
 		if (!argv)
@@ -179,7 +179,7 @@ void	ft_execute(t_shell *shell, char **env)
 	}
 	if (shell->cmd->fd.in != 0)
 		close(shell->cmd->fd.in);
-	if (shell->cmd->fd.out != 1)
+	if (shell->cmd->fd.out != 0)
 		close(shell->cmd->fd.out);
 	waitpid(pid, NULL, 0);
 }
@@ -235,7 +235,7 @@ void	execute_builtin(t_shell *shell, char ***env)
 		//status = 1;
 		return ;
 	}
-	check_fd_builtins(shell->cmd);
+	check_fd(shell->cmd);
 	ft_which_cmd(shell->cmds, env);
 	dup2(in, STDIN_FILENO);
 	dup2(out, STDOUT_FILENO);
@@ -263,26 +263,53 @@ int	exec_builtins_execve(t_shell *shell, char ***env)
 	return (0);
 }
 
-void	child(t_shell *shell, char **env, int fd[2])
+void	dup_close(int *fd1, int fd2)
 {
+	dup2(*fd1, fd2);
+	close(*fd1);
+}
+
+void	execute_cmd(t_shell *shell, char **env)
+{
+	char	**paths = NULL;
+	char	*argv = NULL;
+
+	paths = get_paths(env, shell);
+	argv = get_cmd(paths, shell->cmds[0]);
+	if (!argv)
+	{
+		free_paths(paths);
+		ft_putstr_fd("Minishell: ", 2);
+		ft_putstr_fd(ft_strtrim(shell->cmds[0], "\""), 2);
+		ft_putstr_fd(": Command not found", 2);
+		ft_putstr_fd("\n", 2);
+		exit(127);
+	}
+	if (execve(argv, shell->cmds, env) == -1)
+		error(NULL, errno);
+}
+
+void	child(t_shell *shell, char ***env, int fd[2])
+{
+	exec_redir(shell->redir, &shell->cmd->fd);
 	if (shell->next)
-		dup2(fd[1], 1);
-		close(fd[1]);
-	// ila kan  chi output l cmd, 1 irdo howa fd
-	// ila kan chi input, 0 irdo fd d file
+		dup_close(&fd[1], 1);
+	check_fd(shell->cmd);
 	close(fd[0]);
-	if (!builtin)
-		ft_execute()
+	if (check_builtins(shell->cmds[0]))
+		ft_which_cmd(shell->cmds, env);
+	else
+		execute_cmd(shell, *env);
 }
 
 void	parent(t_shell *shell, int fd[2])
 {
 	if (!shell->next)
 		close(fd[0]);
-	if (cmd->output != NULL && cmd->output->fd >= 3)
-		close(cmd->fd.out);
-	if (cmd->input != NULL && cmd->input->fd >= 3)
-		close(cmd->fd.in);
+	if (shell->redir->outfile != NULL)
+		close(shell->cmd->fd.out);
+	if (shell->redir->infile != NULL)
+		close(shell->cmd->fd.in);
 	close(fd[1]);
 }
 
@@ -295,22 +322,22 @@ void	execute(t_shell *shell, char ***env)
 		exec_builtins_execve(shell, env);
 	else
 	{
-		while (shell)
+		while (shell->next)
 		{
-			pipe(fd);
+			if (shell->next && pipe(fd) == -1)
+				error("pipe", errno);
 			id = fork();
 			if (id == -1)
-				return ; // failure
-			else if (id == 0)
+				error("fork", errno);
+			if (id == 0)
 				child(shell, env, fd);
-			parent(shell, fd);
-			shell = shell->next;
+			else
+			{
+				parent(shell, fd);
+				shell = shell->next;
+			}
+			printf("when\n");
 		}
-		wait_child()
+		waitpid(id, NULL, 0);
 	}
 }
-
-/* else
-{
-	printf("lol abchwia tsna\n");
-}*/

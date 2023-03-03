@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd_builtin.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sben-ela <sben-ela@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:13:14 by aybiouss          #+#    #+#             */
-/*   Updated: 2023/02/24 14:52:36 by sben-ela         ###   ########.fr       */
+/*   Updated: 2023/03/03 16:24:16 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,42 +29,38 @@ void	set_dir(t_env *ev, char *cwd, char *owd)
 	env_elem->value = ft_strdup(owd);
 }
 
-int	cd_builtin(char **cmd, char ***env)
+int	cd_builtin(char **cmd, t_env *env)
 {
-	t_env		*ev;
 	char		cwd[1024];
 	char		owd[1024];
 
-	ev = create_env(*env);
 	getcwd(owd, sizeof(owd));
 	if (!cmd[1])
 	{
-		if (chdir(expand_env("$HOME", *env)) != 0)
+		if (chdir(expand_env("$HOME", env->env)) != 0)
 			return (ft_puterr(cmd[0],
-					expand_env("$HOME", *env), NULL, 1));
+					expand_env("$HOME", env->env), NULL, 1));
 	}
 	else
 	{
 		if (!ft_strcmp(cmd[1], "~") || !ft_strcmp(cmd[1], "--"))
 		{
-			if (chdir(expand_env("$HOME", *env)) != 0)
+			if (chdir(expand_env("$HOME", env->env)) != 0)
 				return (ft_puterr(cmd[0],
-						expand_env("$HOME", *env), NULL, 1));
+						expand_env("$HOME", env->env), NULL, 1));
 		}
 		else if (!ft_strcmp(cmd[1], "-"))
 		{
-			if (chdir(expand_env("$OLDPWD", *env)) != 0)
+			if (chdir(expand_env("$OLDPWD", env->env)) != 0)
 				return (ft_puterr(cmd[0],
-						expand_env("$OLDPWD", *env), NULL, 1));
+						expand_env("$OLDPWD", env->env), NULL, 1));
 		}
 		else if (chdir(cmd[1]) != 0)
 			return (ft_puterr(cmd[0], cmd[1], NULL, 1));
 	}
 	getcwd(cwd, sizeof(cwd));
-	set_dir(ev, cwd, owd);
-	*env = convert_array(ev);
-	del_env(ev);
-	printf("%s\n", getcwd(cwd, sizeof(cwd)));
+	set_dir(env, cwd, owd);
+	env->env = convert_array(env);
 	//status = EXIT_SUCCESS;
 	//return (EXIT_SUCCESS);
 	return (1);

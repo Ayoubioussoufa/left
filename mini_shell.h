@@ -6,7 +6,7 @@
 /*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 17:36:00 by sben-ela          #+#    #+#             */
-/*   Updated: 2023/03/03 13:24:35 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/03 16:25:04 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ typedef struct s_env_elem
 {
 	char				*key;
 	char				*value;
+	int					equal;
 	struct s_env_elem	*next;
 	struct s_env_elem	*prev;
 }	t_env_elem;
@@ -82,7 +83,8 @@ typedef	struct	shell
 
 char **full_cmds(t_cmd *cmd);
 int	cmd_size(t_cmd *cmds);
-void	execute(t_shell *shell, char ***env);
+// void	execute(t_shell *shell, char ***env);
+void    execute(t_shell *shell, t_env *env);
 char	*ft_strchrr(const char *s, int c);
 char	**ft_split(char const *str, char c);
 void    ft_execute(t_shell *shell, char **env);
@@ -100,7 +102,6 @@ void	ft_putstr_fd(char *s, int fd);
 void	ft_putnstr(char *str, int n);
 int    echo_builtin(char **cmd);
 void	ft_putchar(char c);
-int	unset_builtin(char **cmd, char ***ev);
 int	ft_isalpha(int c);
 char	*ft_strdup(char *str);
 char	*ft_substr(char *s, int start, int len);
@@ -162,7 +163,7 @@ char	*ft_strtrim(char *s1, char *set);
 void    freedouble(char **args);
 
 // builtin cd
-int	cd_builtin(char **cmd, char ***env);
+int	cd_builtin(char **cmd, t_env *env);
 void	set_dir(t_env *ev, char *cwd, char *owd);
 
 //builtin echo
@@ -172,13 +173,14 @@ void	ft_putstr(char *s);
 void	ft_putchar(char c);
 
 // builtin env
-int env_builtin(char **cmd, char **env);
+int env_builtin(char **cmd, t_env *env);
 
 // builtin exit
-int exit_builtin(char **cmd, char **env);
+int exit_builtin(char **cmd, t_env *env);
 
 //builtin export
-int	export_builtin(char **cmd, char ***ev);
+int     export_builtin(char **cmd, t_env *env);
+// int	export_builtin(char **cmd, char ***ev);
 void	ft_swapelem(t_env_elem *a, t_env_elem *b);
 void	ft_sort(t_env *env);
 void	print_sorted_env(t_env *env);
@@ -186,5 +188,6 @@ void	add_var(t_env *env, char *cmd); //hadchi ghalt f export
 //builtin pwd
 int	pwd_builtin(char *cmd);
 //builtin unset
-int	unset_builtin(char **cmd, char ***ev);
+int	unset_builtin(char **cmd, t_env *env);
+
 #endif

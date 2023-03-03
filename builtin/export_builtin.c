@@ -6,7 +6,7 @@
 /*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 13:40:06 by aybiouss          #+#    #+#             */
-/*   Updated: 2023/03/02 13:58:12 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/03 16:12:45 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,10 +72,10 @@ void	print_sorted_env(t_env *env)
 	while (current)
 	{
 		printf("declare -x %s", current->key);
-		if (current->value)
+		if (current->value && current->equal)
 			printf("=\"%s\"", current->value);
-		else
-			printf("=\"\""); 
+		else if (current->equal)
+			printf("=\"\"");
 		printf("\n");
 		current = current->next;
 	}
@@ -105,7 +105,6 @@ void	add_var(t_env *env, char *cmd)
 	t_env_elem	*newl;
 
 	newl = new_env_elem(cmd);
-	// printf("%s %s\n", newl->key, newl->value);
 	new = search_env_elem(env, newl->key);
 	if (new)
 	{
@@ -114,7 +113,7 @@ void	add_var(t_env *env, char *cmd)
 		new->value = newl->value;
 	}
 	else
-		add_env_elem(env, new_env_elem(cmd)); //still dk why it doesnt add up
+		add_env_elem(env, new_env_elem(cmd));
 }
 
 int	check_alpha(char *cmd)
@@ -126,20 +125,19 @@ int	check_alpha(char *cmd)
 	{
 		if (ft_isalnum(cmd[i]) || cmd[i] == '_')
 			i++;
+		else if (cmd[i] == '=')
+			return (1);
 		else
 			return (0);
 	}
 	return (1);
 }
 
-int	export_builtin(char **cmd, char ***ev)
+int	export_builtin(char **cmd, t_env *env)
 {
-	t_env	*env;
 	int	i;
 
 	i = 1;
-	env = NULL;
-	env = create_env(*ev);
 	if (!cmd[1])
 		print_sorted_env(env);
 	else
@@ -147,18 +145,16 @@ int	export_builtin(char **cmd, char ***ev)
 		while (cmd[i])
 		{
 			if (!ft_isalpha(cmd[i][0]) && cmd[i][0] != '_')
-				return (ft_puterr(cmd[0],
-					cmd[i], "not a valid identifier", EXIT_FAILURE));
+				ft_puterr(cmd[0],cmd[i], "not a valid identifier", EXIT_FAILURE);
 			if (!check_alpha(cmd[i]))
-				return (ft_puterr(cmd[0],
-					cmd[i], "not a valid identifier", EXIT_FAILURE));
-			add_var(env, cmd[i]);
+				ft_puterr(cmd[0], cmd[i], "not a valid identifier", EXIT_FAILURE);
+			else
+				add_var(env, cmd[i]);
 			i++;
 		}
 	}
-	i = 0;
-	*ev = convert_array(env);
-	del_env(env);
+	env->env = convert_array(env);
+	// del_env(env);
 	// status = EXIT_SUCCESS;
 	// return (EXIT_SUCCESS);
     return (1);

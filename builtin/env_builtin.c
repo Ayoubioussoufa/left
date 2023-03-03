@@ -3,26 +3,26 @@
 /*                                                        :::      ::::::::   */
 /*   env_builtin.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aybiouss <aybiouss@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/15 13:44:55 by aybiouss          #+#    #+#             */
-/*   Updated: 2023/02/22 14:55:06 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/03 14:58:30 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../mini_shell.h"
 
-int env_builtin(char **cmd, char **env)
+int env_builtin(char **cmd, t_env *env)
 {
 	int	i;
 
 	i = 0;
 	if (!cmd[1])
 	{
-		while (env[i])
+		while (env->env[i])
 		{
-			if (ft_strchr(env[i], '=') != -1)
-				printf("%s\n", env[i]);
+			if (ft_strchr(env->env[i], '=') != -1)
+				printf("%s\n", env->env[i]);
 			i++;
 		}
 	}

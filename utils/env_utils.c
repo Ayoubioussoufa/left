@@ -67,6 +67,7 @@ char	*ft_substr(char *s, int start, int len)
 int	ft_strchr(char *s, int c)
 {
 	int	i;
+
 	i = 0;
 	if (c == '\0')
 		return (ft_strlen(s));
@@ -117,6 +118,7 @@ t_env_elem	*new_env_elem(char *line)
 	elem = malloc(sizeof(t_env_elem));
 	elem->next = NULL;
 	elem->prev = NULL;
+	elem->equal = 0;
 	if (!elem)
 	{
     	free(elem);
@@ -128,6 +130,7 @@ t_env_elem	*new_env_elem(char *line)
 		value = ft_substr(line, index + 1, ft_strlen(line) - index);
 		if (!key || !value)
 			return (NULL);
+		elem->equal = 1;
 		elem->key = key;
 		elem->value = value;
 	}

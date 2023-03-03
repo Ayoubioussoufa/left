@@ -79,7 +79,7 @@ char	**convert_array(t_env *env)
 	arr = malloc((env->size + 1) * sizeof(char *));
 	if (arr)
 	{
-		while (i < env->size)
+		while (i <= env->size)
 		{
 			arr[i] = ft_strdup(tmp->key);
 			if (tmp->value)

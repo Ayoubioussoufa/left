@@ -47,5 +47,6 @@ char *parse_read(char *read)
 		i++;
 		j++;
     }
+	line[j] = '\0';
 	return (line);
 }

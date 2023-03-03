@@ -182,9 +182,10 @@ void	mini_shell(char **env)
 	char *read;
 	char *line;
 	char *tmp;
-	(void)env;
 	t_shell *shell;
+	t_env	*ev;
 
+	ev = create_env(env);
 	while (1)
 	{
 		read = readline("\033[0;32mMinishell>> \033[0m");
@@ -198,7 +199,7 @@ void	mini_shell(char **env)
 			line = parse_read(read);
 			shell = parse_line(line, env);
 			// print_data(shell);
-			execute(shell, &env);
+			execute(shell, ev);
 			free(line);
 			//system("leaks mini_shell");
 		}

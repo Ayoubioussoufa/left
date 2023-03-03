@@ -6,7 +6,7 @@
 /*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 18:28:01 by aybiouss          #+#    #+#             */
-/*   Updated: 2023/03/03 14:06:45 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/03 16:39:04 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,7 +203,7 @@ int	check_builtins(char *cmd)
 	return (0);
 }
 
-void	ft_which_cmd(char **cmd, char ***env)
+void	ft_which_cmd(char **cmd, t_env *env)
 {
 	if (cmd[0] && !ft_strcmp(cmd[0], "export"))
 		export_builtin(cmd, env);
@@ -212,16 +212,16 @@ void	ft_which_cmd(char **cmd, char ***env)
 	else if (cmd[0] && !ft_strcmp(cmd[0], "pwd"))
 		pwd_builtin(*cmd);
 	else if (cmd[0] && !ft_strcmp(cmd[0], "exit"))
-		exit_builtin(cmd, *env);
+		exit_builtin(cmd, env);
 	else if (cmd[0] && !ft_strcmp(cmd[0], "cd"))
 		cd_builtin(cmd, env);
 	else if (cmd[0] && !ft_strcmp(cmd[0], "env"))
-		env_builtin(cmd, *env);
+		env_builtin(cmd, env);
 	else if (cmd[0] && !ft_strcmp(cmd[0], "echo"))
 		echo_builtin(cmd);
 }
 
-void	execute_builtin(t_shell *shell, char ***env)
+void	execute_builtin(t_shell *shell, t_env *env)
 {
 	int	in;
 	int	out;
@@ -254,12 +254,12 @@ int	ft_lstsize(t_shell *lst)
 	return (size);
 }
 
-int	exec_builtins_execve(t_shell *shell, char ***env)
+int	exec_builtins_execve(t_shell *shell, t_env *env)
 {
 	if (check_builtins(shell->cmds[0]) == 1)
 		execute_builtin(shell, env);
 	else
-		ft_execute(shell, *env);
+		ft_execute(shell, env->env);
 	return (0);
 }
 
@@ -289,7 +289,7 @@ void	execute_cmd(t_shell *shell, char **env)
 		error(NULL, errno);
 }
 
-void	child(t_shell *shell, char ***env, int fd[2])
+void	child(t_shell *shell, t_env *env, int fd[2])
 {
 	exec_redir(shell->redir, &shell->cmd->fd);
 	if (shell->next)
@@ -299,7 +299,7 @@ void	child(t_shell *shell, char ***env, int fd[2])
 	if (check_builtins(shell->cmds[0]))
 		ft_which_cmd(shell->cmds, env);
 	else
-		execute_cmd(shell, *env);
+		execute_cmd(shell, env->env);
 }
 
 void	parent(t_shell *shell, int fd[2])
@@ -313,7 +313,7 @@ void	parent(t_shell *shell, int fd[2])
 	close(fd[1]);
 }
 
-void	execute(t_shell *shell, char ***env)
+void	execute(t_shell *shell, t_env *env)
 {
 	int	fd[2];
 	pid_t	id;
@@ -322,7 +322,7 @@ void	execute(t_shell *shell, char ***env)
 		exec_builtins_execve(shell, env);
 	else
 	{
-		while (shell->next)
+		while (shell)
 		{
 			if (shell->next && pipe(fd) == -1)
 				error("pipe", errno);

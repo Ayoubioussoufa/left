@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   unset_builtin.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aybiouss <aybiouss@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/14 13:09:29 by aybiouss          #+#    #+#             */
-/*   Updated: 2023/02/22 14:55:06 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/03 15:08:59 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,22 +31,18 @@ void	unset_env(char *cmd, t_env *env)
 	}
 }
 
-int	unset_builtin(char **cmd, char ***ev)
+int	unset_builtin(char **cmd, t_env *env)
 {
-	t_env	*env;
 	int		i;
 
-	i = 1;
-	env = NULL;
-	env = create_env(*ev);
+	i = 0;
 	while (cmd[i])
 	{
 		unset_env(cmd[i], env);
 		free(cmd[i]);
 		i++;
 	}
-	*ev = convert_array(env);
-	del_env(env);
+	env->env = convert_array(env);
 	return (1); //status hnayya succesfully
 }
 //STATUS needed !

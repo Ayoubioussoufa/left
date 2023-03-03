@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_execute.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aybiouss <aybiouss@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 18:28:01 by aybiouss          #+#    #+#             */
-/*   Updated: 2023/03/02 17:10:20 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/03 10:15:43 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -263,15 +263,50 @@ int	exec_builtins_execve(t_shell *shell, char ***env)
 	return (0);
 }
 
+void	child(t_shell *shell, char **env, int fd[2])
+{
+	if (shell->next)
+		dup2(fd[1], 1);
+		close(fd[1]);
+	// ila kan  chi output l cmd, 1 irdo howa fd
+	// ila kan chi input, 0 irdo fd d file
+	close(fd[0]);
+	if (!builtin)
+		ft_execute()
+}
+
+void	parent(t_shell *shell, int fd[2])
+{
+	if (!shell->next)
+		close(fd[0]);
+	if (cmd->output != NULL && cmd->output->fd >= 3)
+		close(cmd->fd.out);
+	if (cmd->input != NULL && cmd->input->fd >= 3)
+		close(cmd->fd.in);
+	close(fd[1]);
+}
+
 void	execute(t_shell *shell, char ***env)
 {
-	// int	fd[2];
+	int	fd[2];
+	pid_t	id;
 
 	if (ft_lstsize(shell) == 1)
 		exec_builtins_execve(shell, env);
 	else
 	{
-		;
+		while (shell)
+		{
+			pipe(fd);
+			id = fork();
+			if (id == -1)
+				return ; // failure
+			else if (id == 0)
+				child(shell, env, fd);
+			parent(shell, fd);
+			shell = shell->next;
+		}
+		wait_child()
 	}
 }
 

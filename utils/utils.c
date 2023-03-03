@@ -6,7 +6,7 @@
 /*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/22 15:14:26 by aybiouss          #+#    #+#             */
-/*   Updated: 2023/03/03 11:47:06 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/03 17:56:57 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ t_cmd	*new_cmd(char *content)
 		return (0);
 	new->cmd = content;
 	new->fd.in = 0;
-	new->fd.out = 0;
+	new->fd.out = 1;
 	new->next = NULL;
 	return (new);
 }

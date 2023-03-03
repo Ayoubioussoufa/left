@@ -6,7 +6,7 @@
 /*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 18:28:01 by aybiouss          #+#    #+#             */
-/*   Updated: 2023/03/03 16:39:04 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/03 18:12:21 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ void	check_fd(t_cmd *cmd)
 		dup2(cmd->fd.in, STDIN_FILENO);
 		close(cmd->fd.in);
 	}
-	if (cmd->fd.out != 0)
+	if (cmd->fd.out != 1)
 	{
 		dup2(cmd->fd.out, STDOUT_FILENO);
 		close(cmd->fd.out);
@@ -294,8 +294,9 @@ void	child(t_shell *shell, t_env *env, int fd[2])
 	exec_redir(shell->redir, &shell->cmd->fd);
 	if (shell->next)
 		dup_close(&fd[1], 1);
+	if (shell->cmd->fd.in == 0)
+		dup_close(&fd[0], 0);
 	check_fd(shell->cmd);
-	close(fd[0]);
 	if (check_builtins(shell->cmds[0]))
 		ft_which_cmd(shell->cmds, env);
 	else
@@ -305,17 +306,17 @@ void	child(t_shell *shell, t_env *env, int fd[2])
 void	parent(t_shell *shell, int fd[2])
 {
 	if (!shell->next)
-		close(fd[0]);
-	if (shell->redir->outfile != NULL)
+		close(fd[1]);
+	if (shell && shell->redir && shell->redir->outfile)
 		close(shell->cmd->fd.out);
-	if (shell->redir->infile != NULL)
+	if (shell && shell->redir && shell->redir->infile)
 		close(shell->cmd->fd.in);
-	close(fd[1]);
+	// close(fd[0]);
 }
 
 void	execute(t_shell *shell, t_env *env)
 {
-	int	fd[2];
+	int		fd[2];
 	pid_t	id;
 
 	if (ft_lstsize(shell) == 1)
@@ -336,7 +337,6 @@ void	execute(t_shell *shell, t_env *env)
 				parent(shell, fd);
 				shell = shell->next;
 			}
-			printf("when\n");
 		}
 		waitpid(id, NULL, 0);
 	}

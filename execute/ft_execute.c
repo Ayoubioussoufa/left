@@ -6,7 +6,7 @@
 /*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 18:28:01 by aybiouss          #+#    #+#             */
-/*   Updated: 2023/03/03 18:12:21 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/03 18:24:08 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -292,11 +292,11 @@ void	execute_cmd(t_shell *shell, char **env)
 void	child(t_shell *shell, t_env *env, int fd[2])
 {
 	exec_redir(shell->redir, &shell->cmd->fd);
+	check_fd(shell->cmd);
 	if (shell->next)
 		dup_close(&fd[1], 1);
 	if (shell->cmd->fd.in == 0)
 		dup_close(&fd[0], 0);
-	check_fd(shell->cmd);
 	if (check_builtins(shell->cmds[0]))
 		ft_which_cmd(shell->cmds, env);
 	else
@@ -307,11 +307,10 @@ void	parent(t_shell *shell, int fd[2])
 {
 	if (!shell->next)
 		close(fd[1]);
-	if (shell && shell->redir && shell->redir->outfile)
-		close(shell->cmd->fd.out);
-	if (shell && shell->redir && shell->redir->infile)
-		close(shell->cmd->fd.in);
-	// close(fd[0]);
+	// if (shell && shell->redir && shell->redir->outfile)
+	// 	close(shell->cmd->fd.out);
+	// if (shell && shell->redir && shell->redir->infile)
+	// 	close(shell->cmd->fd.in);
 }
 
 void	execute(t_shell *shell, t_env *env)

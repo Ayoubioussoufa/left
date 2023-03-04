@@ -3,15 +3,42 @@
 /*                                                        :::      ::::::::   */
 /*   ft_execute.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aybiouss <aybiouss@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 18:28:01 by aybiouss          #+#    #+#             */
-/*   Updated: 2023/03/04 10:17:54 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/04 17:14:11 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #include "../mini_shell.h"
+
+void	here_doc(t_redire *redir, char **env)
+{
+	int			fd;
+	char		*str;
+
+	// signal(SIGINT, SIG_DFL);
+	// printf("ZID\n");
+	// printf("%s\n", redir->delimiter);
+	fd = open("redir->delimiter", O_RDWR | O_TRUNC | O_CREAT, 0666);
+	if (fd < 0)
+	{
+		perror("minishell");
+		return ;
+	}
+	str = readline("> ");
+	while (str && ft_strncmp(str, redir->delimiter, ft_strlen(redir->delimiter)))
+	{
+		if (redir->couts)
+			str = expand_env(str, env);
+		write(fd, str, ft_strlen(str));
+		write(fd, "\n", 1);
+		free(str);
+		str = readline("> ");
+	}
+	free(str);
+	close(fd);
+}
 
 void	free_paths(char **paths)
 {
@@ -28,7 +55,7 @@ void	free_paths(char **paths)
 
 int	exec_redir_in(char *infile, int *in)
 {
-	if (access(infile, X_OK) == 0)
+	if (access(infile, F_OK) == 0)
 	{
 		close(*in);
 		*in = open(infile, O_RDONLY, 0666); //protection;
@@ -43,13 +70,14 @@ int	exec_redir_in(char *infile, int *in)
 	}
 }
 
-void	exec_redir(t_redire *redir, t_fd *fd)
+void	exec_redir(t_redire *redir, t_fd *fd, char **env)
 {
 	t_redire	*tmp;
 
 	tmp = redir;
 	while (tmp)
 	{
+		// printf("%d\n", tmp->type);
 		if (tmp->type == INFILE)
 			exec_redir_in(tmp->infile, &fd->in);
 		else if (tmp->type == OUTFILE)
@@ -64,8 +92,8 @@ void	exec_redir(t_redire *redir, t_fd *fd)
 		}
 		else if (tmp->type == DELIMITER)
 		{
-			close(fd->in);
-			fd->in = open(tmp->delimiter, O_RDONLY, 0666); //protection
+			// close(fd->out);
+			here_doc(tmp, env);
 		}
 		tmp = tmp->next;
 	}
@@ -159,8 +187,11 @@ void	ft_execute(t_shell *shell, char **env)
 		{
 			success = exec_redir_in(shell->redir->infile, &shell->cmd->fd.in);
 			if (!success)
+			{
+				printf("WHATEVER\n");	
 				exit(1);
-			exec_redir(shell->redir, &shell->cmd->fd);
+			}
+			exec_redir(shell->redir, &shell->cmd->fd, env);
 		}
 		check_fd(shell->cmd);
 		paths = get_paths(env, shell);
@@ -179,7 +210,7 @@ void	ft_execute(t_shell *shell, char **env)
 	}
 	if (shell->cmd->fd.in != 0)
 		close(shell->cmd->fd.in);
-	if (shell->cmd->fd.out != 0)
+	if (shell->cmd->fd.out != 1)
 		close(shell->cmd->fd.out);
 	waitpid(pid, NULL, 0);
 }
@@ -229,7 +260,7 @@ void	execute_builtin(t_shell *shell, t_env *env)
 	in = dup(STDIN_FILENO);
 	out = dup(STDOUT_FILENO);
 	if (shell->redir)
-		exec_redir(shell->redir, &shell->cmd->fd);
+		exec_redir(shell->redir, &shell->cmd->fd, env->env);
 	if (shell->cmd->fd.in == -1)
 	{
 		//status = 1;
@@ -291,7 +322,7 @@ void	execute_cmd(t_shell *shell, char **env)
 
 void	child(t_shell *shell, t_env *env, int fd[2])
 {
-	exec_redir(shell->redir, &shell->cmd->fd);
+	exec_redir(shell->redir, &shell->cmd->fd, env->env);
 	check_fd(shell->cmd);
 	if (shell->next)
 		dup_close(&fd[1], 1);
@@ -301,6 +332,7 @@ void	child(t_shell *shell, t_env *env, int fd[2])
 		ft_which_cmd(shell->cmds, env);
 	else
 		execute_cmd(shell, env->env);
+	exit(EXIT_SUCCESS);
 }
 
 void	parent(t_shell *shell, int fd[2])
@@ -341,33 +373,3 @@ void	execute(t_shell *shell, t_env *env)
 		waitpid(id, NULL, 0);
 	}
 }
-
-
-/*
-void	here_doc(t_redirec *redirc, char **envp)
-{
-	int			fd;
-	char		*str;
-
-	signal(SIGINT, SIG_DFL);
-	fd = open(redirc->path, O_RDWR | O_TRUNC | O_CREAT, 0666);
-	if (fd < 0)
-	{
-		perror("minishell");
-		return ;
-	}
-	str = readline("> ");
-	while (str && ft_strcmp(str, redirc->after_expand[0]))
-	{
-		if (!ft_strchr(redirc->file, '\'')
-			&& !ft_strchr(redirc->file, '"'))
-			str = here_doc_expand(str, envp);
-		write(fd, str, ft_strlen(str));
-		write(fd, "\n", 1);
-		free(str);
-		str = readline("> ");
-	}
-	free(str);
-	close(fd);
-}
-*/

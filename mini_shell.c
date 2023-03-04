@@ -197,7 +197,7 @@ void	mini_shell(char **env)
 		if (read[0] && !parse_syntax(tmp, 0))
 		{
 			line = parse_read(read);
-			shell = parse_line(line, env);
+			shell = parse_line(line, ev->env);
 			// print_data(shell);
 			execute(shell, ev);
 			free(line);

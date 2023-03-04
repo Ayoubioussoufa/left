@@ -6,7 +6,7 @@
 /*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 17:36:00 by sben-ela          #+#    #+#             */
-/*   Updated: 2023/03/03 16:25:04 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/04 17:15:50 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ typedef struct redire
 	char	*infile;// 0 : input
 	char	*outfile; // 1 : out
 	char	*delimiter;
+	int		couts;
 	struct redire *next;
 }	t_redire;
 

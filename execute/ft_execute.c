@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_execute.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aybiouss <aybiouss@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 18:28:01 by aybiouss          #+#    #+#             */
-/*   Updated: 2023/03/03 18:24:08 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/04 10:17:54 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -306,11 +306,12 @@ void	child(t_shell *shell, t_env *env, int fd[2])
 void	parent(t_shell *shell, int fd[2])
 {
 	if (!shell->next)
-		close(fd[1]);
-	// if (shell && shell->redir && shell->redir->outfile)
-	// 	close(shell->cmd->fd.out);
-	// if (shell && shell->redir && shell->redir->infile)
-	// 	close(shell->cmd->fd.in);
+		close(fd[0]); //kant fd[1]
+	if (shell && shell->redir && shell->redir->outfile)
+		close(shell->cmd->fd.out);
+	if (shell && shell->redir && shell->redir->infile)
+		close(shell->cmd->fd.in);
+	close(fd[1]);
 }
 
 void	execute(t_shell *shell, t_env *env)
@@ -340,3 +341,33 @@ void	execute(t_shell *shell, t_env *env)
 		waitpid(id, NULL, 0);
 	}
 }
+
+
+/*
+void	here_doc(t_redirec *redirc, char **envp)
+{
+	int			fd;
+	char		*str;
+
+	signal(SIGINT, SIG_DFL);
+	fd = open(redirc->path, O_RDWR | O_TRUNC | O_CREAT, 0666);
+	if (fd < 0)
+	{
+		perror("minishell");
+		return ;
+	}
+	str = readline("> ");
+	while (str && ft_strcmp(str, redirc->after_expand[0]))
+	{
+		if (!ft_strchr(redirc->file, '\'')
+			&& !ft_strchr(redirc->file, '"'))
+			str = here_doc_expand(str, envp);
+		write(fd, str, ft_strlen(str));
+		write(fd, "\n", 1);
+		free(str);
+		str = readline("> ");
+	}
+	free(str);
+	close(fd);
+}
+*/

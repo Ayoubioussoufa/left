@@ -6,7 +6,7 @@
 /*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 18:28:01 by aybiouss          #+#    #+#             */
-/*   Updated: 2023/03/04 17:14:11 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/04 18:33:40 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,16 +19,21 @@ void	here_doc(t_redire *redir, char **env)
 
 	// signal(SIGINT, SIG_DFL);
 	// printf("ZID\n");
-	// printf("%s\n", redir->delimiter);
+	printf("%s\n", redir->delimiter);
 	fd = open("redir->delimiter", O_RDWR | O_TRUNC | O_CREAT, 0666);
 	if (fd < 0)
 	{
 		perror("minishell");
 		return ;
 	}
+	printf("2zid\n");
 	str = readline("> ");
+	// if (!str)
+	// 	exit(0);
+	printf("%s\n", str);
 	while (str && ft_strncmp(str, redir->delimiter, ft_strlen(redir->delimiter)))
 	{
+		printf("%d\n", redir->couts);
 		if (redir->couts)
 			str = expand_env(str, env);
 		write(fd, str, ft_strlen(str));
@@ -91,10 +96,7 @@ void	exec_redir(t_redire *redir, t_fd *fd, char **env)
 			fd->out = open(tmp->outfile, O_WRONLY | O_CREAT | O_APPEND, 0666);
 		}
 		else if (tmp->type == DELIMITER)
-		{
-			// close(fd->out);
 			here_doc(tmp, env);
-		}
 		tmp = tmp->next;
 	}
 }
@@ -185,12 +187,13 @@ void	ft_execute(t_shell *shell, char **env)
 	{
 		if (shell->redir)
 		{
-			success = exec_redir_in(shell->redir->infile, &shell->cmd->fd.in);
-			if (!success)
-			{
-				printf("WHATEVER\n");	
-				exit(1);
-			}
+			// success = exec_redir_in(shell->redir->infile, &shell->cmd->fd.in);
+			// if (!success)
+			// {
+			// 	printf("WHATEVER\n");
+			// 	exit(1);
+			// }
+			// printf("ppp\n");
 			exec_redir(shell->redir, &shell->cmd->fd, env);
 		}
 		check_fd(shell->cmd);
@@ -290,7 +293,10 @@ int	exec_builtins_execve(t_shell *shell, t_env *env)
 	if (check_builtins(shell->cmds[0]) == 1)
 		execute_builtin(shell, env);
 	else
+	{
+		printf("1zid\n");
 		ft_execute(shell, env->env);
+	}
 	return (0);
 }
 

@@ -43,10 +43,10 @@ char *parse_read(char *read)
 			i = handledel(line, i, '<'),j++;
 		else if (read[j] == '>')
 			i = handledel(line, i, '>'),j++;
-		line[i] = read[j];
+			line[i] = read[j];
 		i++;
 		j++;
     }
-	line[j] = '\0';
+	line[i] = '\0';
 	return (line);
 }

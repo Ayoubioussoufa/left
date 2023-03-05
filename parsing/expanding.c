@@ -58,30 +58,47 @@ char	*char_join(char *str, char c)
 	return(dst);
 }
 
-char	*get_value(char *str,char **env)
+char    *get_value(char *str, char **env)
 {
-    char *var;
-    char *string;
-    char *value = 0;
+    char    *var;
+    char    *string;
+    char    *value;
+    int p;
 
-    string = "";
+    p = 0;
+    string = malloc(1);
+    string[0] = 0;
     while (*str)
     {
+        if (*str == '\"')
+            p = 1;
         if (*str == '$')
         {
             var = ft_substr(str, 1, getend(str));
             if(!var[0])
-                value = "$";
+                value = ft_strdup("$");
             else
                 value = find_value(var, env);
-            string = ft_strjoin(string, value);
+            string = ft_strjoinfree(string, value);
             str += ft_strlen(var) + 1;
+        }
+        else if (*str == '\'' && p != 1)
+        {
+            str++;
+            while (*str && *str != '\'')
+            {
+                string = char_join(string, *str);
+                str++;
+            }
+            str++;
         }
         else
         {
             string = char_join(string, *str);
             str++;
         }
+        if (p == 1 && *str == '\"')
+            p = 0;
     }
-    return(string);
+    return (string);
 }

@@ -70,13 +70,13 @@ void	ft_getnew(char **split, char **env, int i, t_shell **new)
 	{
 		split[i] = parseword(split[i], env);
 		if (!ft_strcmp(split[i], ">"))
-			redi_add_back(&(*new)->redir, new_redir(get_value(split[++i], env), OUTFILE));
+			redi_add_back(&(*new)->redir, new_redir(parseword(split[++i], env), OUTFILE));
 		else if (!ft_strcmp(split[i], "<"))
-			redi_add_back(&(*new)->redir, new_redir(get_value(split[++i], env), INFILE));
+			redi_add_back(&(*new)->redir, new_redir(parseword(split[++i], env), INFILE));
 		else if (!ft_strcmp(split[i], "<<"))
-			redi_add_back(&(*new)->redir, new_redir(get_value(split[++i], env), DELIMITER));
+			redi_add_back(&(*new)->redir, new_redir(parseword(split[++i], env), DELIMITER));
 		else if (!ft_strcmp(split[i], ">>"))
-			redi_add_back(&(*new)->redir, new_redir(get_value(split[++i], env), APPEND));
+			redi_add_back(&(*new)->redir, new_redir(parseword(split[++i], env), APPEND));
 		else
 		{
 			if (check_edges(split[i]))
@@ -222,7 +222,8 @@ void	mini_shell(char **env)
 		{
 			line = parse_read(read);
 			shell = parse_line(line, ev->env);
-			execute(shell, ev);
+			print_data(shell);
+			// execute(shell, ev);
 		}
 		else if (read[0])
 			printf("syntax error\n");

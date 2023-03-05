@@ -6,7 +6,7 @@
 /*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/23 11:01:50 by sben-ela          #+#    #+#             */
-/*   Updated: 2023/03/05 16:02:28 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/05 17:40:19 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@
 // {
 // 	static int i;
 
-// 	if(handle_pipes(line) || count_single_couts(line) || count_double_couts(line))
+// 	if(handle_pipes(line) || count_single_quotes(line) || count_double_quotes(line))
 // 		return (1);
 // 	line = ft_strtrim(line, "\"");
 // 	line = ft_strtrim(line, "\'");
@@ -133,14 +133,14 @@ int parse_syntax(char *line, char c)
     // char    **splited;
 
     // splited = ft_split_v2(line, ' ');
-    if (handle_pipes(line) || count_single_couts(line) || count_double_couts(line))
+    if (handle_pipes(line) || count_single_quotes(line) || count_double_quotes(line))
         return (1);
     trimmed_line = ft_strdup(line);
     // printf("0 OUT %s\n", trimmed_line);
-    if (!count_double_couts(line))
+    if (!count_double_quotes(line))
         trimmed_line = ft_strtrime(trimmed_line, "\"");
     // printf("9999 OUT %s\n", trimmed_line);
-    if (count_single_couts(line))
+    if (count_single_quotes(line))
         trimmed_line = ft_strtrime(trimmed_line, "\'");
     // printf("OUT %s\n", trimmed_line);
     if (parse_redir(trimmed_line, 0))
@@ -185,7 +185,7 @@ handle_pipes now correctly frees the str variable before returning if there is a
 
 parse_syntax now initializes i to zero, since it's a static variable and needs to be reset between calls. It also checks if there is an odd number of single or double quotes in the input string.
 
-The count_single_couts and count_double_couts functions were removed, since they are not defined in the provided code and are not necessary for the parse_syntax function to work.
+The count_single_quotes and count_double_quotes functions were removed, since they are not defined in the provided code and are not necessary for the parse_syntax function to work.
 
 In parse_redir, the condition (line[i] == '>' && !line[i + 1]) was added to check for a trailing redirect symbol '>' with no argument.
 count_char now initializes `

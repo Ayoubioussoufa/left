@@ -6,7 +6,7 @@
 /*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 17:36:00 by sben-ela          #+#    #+#             */
-/*   Updated: 2023/03/05 16:28:29 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/05 18:04:59 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ typedef struct redire
 	char	*infile;
 	char	*outfile;
 	char	*delimiter;
-	int		couts;
+	int		quotes;
 	struct redire *next;
 }	t_redire;
 
@@ -83,11 +83,11 @@ typedef	struct	shell
 }	t_shell;
 
 //PARSING
-char	**full_cmds(t_cmd *cmd);
-int		cmd_size(t_cmd *cmds);
-char	*ft_strchrr(const char *s, int c);
-char	**ft_split(char const *str, char c);
-char	*parse_redirect(char *line);
+char		**full_cmds(t_cmd *cmd);
+int			cmd_size(t_cmd *cmds);
+char		*ft_strchrr(const char *s, int c);
+char		**ft_split(char const *str, char c);
+char		*parse_redirect(char *line);
 t_redire	*redilast(t_redire *lst);
 t_redire	*new_redir(char *content, int type);
 void		redi_add_back(t_redire **lst, t_redire *new);
@@ -95,6 +95,7 @@ t_cmd		*last_cmd(t_cmd *lst);
 void		cmd_add_back(t_cmd **lst, t_cmd *new);
 t_cmd		*new_cmd(char *content);
 char 		*parse_read(char *read);
+int			check_edges(char *str);
 
 // ENV utils
 char		**convert_array(t_env *env);
@@ -138,8 +139,8 @@ int			ft_strncmp(char *s1, char *s2, unsigned int n);
 char		*ft_strjoin(char *left_str, char *buff);
 void		ft_putstr_fd(char *s, int fd);
 int			parse_syntax(char *line, char c);
-int			count_single_couts(char *line);
-int			count_double_couts(char *line);
+int			count_single_quotes(char *line);
+int			count_double_quotes(char *line);
 char		*get_value(char *str,char **env);
 int			ft_isalnum(int c);
 char		*ft_strnstr(const char *haystack, const char *needle, size_t len);
@@ -168,7 +169,7 @@ char		**get_paths(char **env, t_shell *shell);
 char		*get_cmd(char **paths, char *cmd);
 void		error(char *str, int n);
 void		check_fd(t_cmd *cmd);
-void		exec_redir(t_redire *redir, t_fd *fd, char **env);
+void		exec_redir(t_redire *redir, t_fd *fd);
 int			exec_redir_in(char *infile, int *in);
 void		free_paths(char **paths);
 void		here_doc(t_redire *redir, char **env);

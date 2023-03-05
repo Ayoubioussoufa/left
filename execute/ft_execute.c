@@ -6,7 +6,7 @@
 /*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 18:28:01 by aybiouss          #+#    #+#             */
-/*   Updated: 2023/03/05 13:08:24 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/05 18:05:30 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,11 @@ void	here_doc(t_redire *redir, char **env)
 {
 	int			fd;
 	char		*str;
+	// static int	i;
 
 	// signal(SIGINT, SIG_DFL);
 	// printf("ZID\n");
+
 	fd = open("tz", O_RDWR | O_TRUNC | O_CREAT, 0666);
 	if (fd < 0)
 	{
@@ -28,7 +30,8 @@ void	here_doc(t_redire *redir, char **env)
 	str = readline("> ");
 	while (str && ft_strncmp(str, redir->delimiter, ft_strlen(redir->delimiter)))
 	{
-		if (!redir->couts)
+		// printf("%d\n", redir->quotes);
+		if (!redir->quotes)
 			str = expand_env(str, env);
 		write(fd, str, ft_strlen(str));
 		write(fd, "\n", 1);
@@ -36,6 +39,7 @@ void	here_doc(t_redire *redir, char **env)
 		str = readline("> ");
 	}
 	free(str);
+	// unlink("tz");
 	close(fd);
 }
 
@@ -69,7 +73,7 @@ int	exec_redir_in(char *infile, int *in)
 	}
 }
 
-void	exec_redir(t_redire *redir, t_fd *fd, char **env)
+void	exec_redir(t_redire *redir, t_fd *fd)
 {
 	t_redire	*tmp;
 
@@ -88,8 +92,6 @@ void	exec_redir(t_redire *redir, t_fd *fd, char **env)
 			close(fd->out);
 			fd->out = open(tmp->outfile, O_WRONLY | O_CREAT | O_APPEND, 0666);
 		}
-		else if (tmp->type == DELIMITER)
-			here_doc(tmp, env);
 		tmp = tmp->next;
 	}
 }
@@ -183,7 +185,7 @@ void	ft_execute(t_shell *shell, char **env)
 			success = exec_redir_in(shell->redir->infile, &shell->cmd->fd.in);
 			if (!success)
 				exit(1);
-			exec_redir(shell->redir, &shell->cmd->fd, env);
+			exec_redir(shell->redir, &shell->cmd->fd);
 		}
 		check_fd(shell->cmd);
 		paths = get_paths(env, shell);
@@ -252,7 +254,7 @@ void	execute_builtin(t_shell *shell, t_env *env)
 	in = dup(STDIN_FILENO);
 	out = dup(STDOUT_FILENO);
 	if (shell->redir)
-		exec_redir(shell->redir, &shell->cmd->fd, env->env);
+		exec_redir(shell->redir, &shell->cmd->fd);
 	if (shell->cmd->fd.in == -1)
 	{
 		//status = 1;
@@ -277,16 +279,34 @@ int	ft_lstsize(t_shell *lst)
 	return (size);
 }
 
+void	open_heredocs(t_shell *shell, t_env *env)
+{
+	t_shell	*tmp;
+
+	tmp = shell;
+	while (tmp)
+	{
+		while (tmp->redir)
+		{
+			if (tmp->redir->type == DELIMITER)
+				here_doc(tmp->redir, env->env);
+			tmp->redir = tmp->redir->next;
+		}
+		tmp = tmp->next;
+	}
+}
+
 int	exec_builtins_execve(t_shell *shell, t_env *env)
 {
 	// exec_redir(shell->redir, &shell->cmd->fd, env->env);
-	if (check_builtins(shell->cmds[0]) == 1)
-		execute_builtin(shell, env);
-	else
-	{
-		// printf("1zid\n");
-		ft_execute(shell, env->env);
-	}
+	open_heredocs(shell, env);
+	// if (check_builtins(shell->cmds[0]) == 1)
+	// 	execute_builtin(shell, env);
+	// else
+	// {
+	// 	// printf("1zid\n");
+	// 	ft_execute(shell, env->env);
+	// }
 	return (0);
 }
 
@@ -318,7 +338,7 @@ void	execute_cmd(t_shell *shell, char **env)
 
 void	child(t_shell *shell, t_env *env, int fd[2])
 {
-	exec_redir(shell->redir, &shell->cmd->fd, env->env);
+	exec_redir(shell->redir, &shell->cmd->fd);
 	check_fd(shell->cmd);
 	if (shell->next)
 		dup_close(&fd[1], 1);
@@ -347,7 +367,8 @@ void	execute(t_shell *shell, t_env *env)
 	// int		fd[2];
 	// pid_t	id;
 
-	if (ft_lstsize(shell) == 1)
+	
+	// if (ft_lstsize(shell) == 1)
 		exec_builtins_execve(shell, env);
 	// else
 	// {

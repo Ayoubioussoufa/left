@@ -41,7 +41,7 @@ int count_redirect(char *line)
 	return(count);
 }
 
-int	*skip_char_between_couts(char *line, char *new_line, int i, int j)
+int	*skip_char_between_quotes(char *line, char *new_line, int i, int j)
 {
 	int *tab = malloc(8);
 	if(line[i] == '"')
@@ -97,7 +97,7 @@ void	parse_all(char *line, char *new_line, int i, int j)
 
 	while (line[i])
 	{
-		tab = skip_char_between_couts(line, new_line, i, j);
+		tab = skip_char_between_quotes(line, new_line, i, j);
 		i = tab[0];
 		j = tab[1];
 		//free(tab);

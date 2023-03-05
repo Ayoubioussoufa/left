@@ -20,7 +20,7 @@ void	print_data(t_shell *shell)
 			if (shell->redir->type == APPEND)
 				printf("APPEND : %s\n", shell->redir->outfile);
 			if (shell->redir->type == DELIMITER)
-				printf("DELIMITER : %s : %d\n", shell->redir->delimiter, shell->redir->couts);
+				printf("DELIMITER : %s : %d\n", shell->redir->delimiter, shell->redir->quotes);
 			shell->redir = shell->redir->next;
 		}
 		shell = shell->next;

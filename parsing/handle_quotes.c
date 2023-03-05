@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   handle_couts.c                                     :+:      :+:    :+:   */
+/*   handle_quotes.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -69,7 +69,7 @@ char *handle_param(char *str, char c)
 	return(dst);
 }
 
-int	count_single_couts(char *line)
+int	count_single_quotes(char *line)
 {
 	int i;
 	int count;
@@ -91,7 +91,7 @@ int	count_single_couts(char *line)
 	return(count % 2);
 }
 
-int	count_double_couts(char *line)
+int	count_double_quotes(char *line)
 {
 	int i;
 	int count;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strlen.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aybiouss <aybiouss@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/05 16:49:33 by aybiouss          #+#    #+#             */
-/*   Updated: 2023/02/18 12:55:00 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/05 13:02:58 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,11 @@ size_t	ft_strlen(const char *str)
 {
 	size_t	i;
 
+	if (!str)
+    {
+        printf("Error: null pointer passed to ft_strlen\n");
+        exit(EXIT_FAILURE);
+    }
 	i = 0;
 	while (str[i] != '\0')
 		i++;

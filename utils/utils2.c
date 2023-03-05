@@ -80,6 +80,6 @@ char	*ft_strtrimfree(char *s1, char *set)
 	while (s1[len] && check(set, s1[len]))
 		len--;
 	mem = ft_substr(s1, i, len - i + 1);
-	//free(s1);
+	free(s1);
 	return (mem);
 }

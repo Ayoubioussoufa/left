@@ -6,7 +6,7 @@
 /*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 18:28:01 by aybiouss          #+#    #+#             */
-/*   Updated: 2023/03/04 18:33:40 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/05 13:08:24 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,22 +19,16 @@ void	here_doc(t_redire *redir, char **env)
 
 	// signal(SIGINT, SIG_DFL);
 	// printf("ZID\n");
-	printf("%s\n", redir->delimiter);
-	fd = open("redir->delimiter", O_RDWR | O_TRUNC | O_CREAT, 0666);
+	fd = open("tz", O_RDWR | O_TRUNC | O_CREAT, 0666);
 	if (fd < 0)
 	{
 		perror("minishell");
 		return ;
 	}
-	printf("2zid\n");
 	str = readline("> ");
-	// if (!str)
-	// 	exit(0);
-	printf("%s\n", str);
 	while (str && ft_strncmp(str, redir->delimiter, ft_strlen(redir->delimiter)))
 	{
-		printf("%d\n", redir->couts);
-		if (redir->couts)
+		if (!redir->couts)
 			str = expand_env(str, env);
 		write(fd, str, ft_strlen(str));
 		write(fd, "\n", 1);
@@ -63,7 +57,7 @@ int	exec_redir_in(char *infile, int *in)
 	if (access(infile, F_OK) == 0)
 	{
 		close(*in);
-		*in = open(infile, O_RDONLY, 0666); //protection;
+		*in = open(infile, O_RDONLY, 0666);
 		return (1);
 	}
 	else
@@ -82,7 +76,6 @@ void	exec_redir(t_redire *redir, t_fd *fd, char **env)
 	tmp = redir;
 	while (tmp)
 	{
-		// printf("%d\n", tmp->type);
 		if (tmp->type == INFILE)
 			exec_redir_in(tmp->infile, &fd->in);
 		else if (tmp->type == OUTFILE)
@@ -187,13 +180,9 @@ void	ft_execute(t_shell *shell, char **env)
 	{
 		if (shell->redir)
 		{
-			// success = exec_redir_in(shell->redir->infile, &shell->cmd->fd.in);
-			// if (!success)
-			// {
-			// 	printf("WHATEVER\n");
-			// 	exit(1);
-			// }
-			// printf("ppp\n");
+			success = exec_redir_in(shell->redir->infile, &shell->cmd->fd.in);
+			if (!success)
+				exit(1);
 			exec_redir(shell->redir, &shell->cmd->fd, env);
 		}
 		check_fd(shell->cmd);
@@ -290,11 +279,12 @@ int	ft_lstsize(t_shell *lst)
 
 int	exec_builtins_execve(t_shell *shell, t_env *env)
 {
+	// exec_redir(shell->redir, &shell->cmd->fd, env->env);
 	if (check_builtins(shell->cmds[0]) == 1)
 		execute_builtin(shell, env);
 	else
 	{
-		printf("1zid\n");
+		// printf("1zid\n");
 		ft_execute(shell, env->env);
 	}
 	return (0);
@@ -344,7 +334,7 @@ void	child(t_shell *shell, t_env *env, int fd[2])
 void	parent(t_shell *shell, int fd[2])
 {
 	if (!shell->next)
-		close(fd[0]); //kant fd[1]
+		close(fd[0]);
 	if (shell && shell->redir && shell->redir->outfile)
 		close(shell->cmd->fd.out);
 	if (shell && shell->redir && shell->redir->infile)
@@ -354,28 +344,28 @@ void	parent(t_shell *shell, int fd[2])
 
 void	execute(t_shell *shell, t_env *env)
 {
-	int		fd[2];
-	pid_t	id;
+	// int		fd[2];
+	// pid_t	id;
 
 	if (ft_lstsize(shell) == 1)
 		exec_builtins_execve(shell, env);
-	else
-	{
-		while (shell)
-		{
-			if (shell->next && pipe(fd) == -1)
-				error("pipe", errno);
-			id = fork();
-			if (id == -1)
-				error("fork", errno);
-			if (id == 0)
-				child(shell, env, fd);
-			else
-			{
-				parent(shell, fd);
-				shell = shell->next;
-			}
-		}
-		waitpid(id, NULL, 0);
-	}
+	// else
+	// {
+	// 	while (shell)
+	// 	{
+	// 		if (shell->next && pipe(fd) == -1)
+	// 			error("pipe", errno);
+	// 		id = fork();
+	// 		if (id == -1)
+	// 			error("fork", errno);
+	// 		if (id == 0)
+	// 			child(shell, env, fd);
+	// 		else
+	// 		{
+	// 			parent(shell, fd);
+	// 			shell = shell->next;
+	// 		}
+	// 	}
+	// 	waitpid(id, NULL, 0);
+	// }
 }

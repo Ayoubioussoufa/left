@@ -6,7 +6,7 @@
 /*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:13:14 by aybiouss          #+#    #+#             */
-/*   Updated: 2023/03/03 16:24:16 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/05 16:11:23 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,8 @@ void	set_dir(t_env *ev, char *cwd, char *owd)
 
 int	cd_builtin(char **cmd, t_env *env)
 {
-	char		cwd[1024];
-	char		owd[1024];
+	char		cwd[524];
+	char		owd[524];
 
 	getcwd(owd, sizeof(owd));
 	if (!cmd[1])

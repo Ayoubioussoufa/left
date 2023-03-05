@@ -9,7 +9,7 @@ void	print_data(t_shell *shell)
 		i = 0;
 		printf("index : %d      pipe : %d\n", shell->index, shell->pipe);
 		while(shell->cmds[i])
-			printf("%s ", shell->cmds[i++]);
+			printf("%s\t", shell->cmds[i++]);
 		printf("\n");
 		while(shell->redir)
 		{
@@ -20,7 +20,7 @@ void	print_data(t_shell *shell)
 			if (shell->redir->type == APPEND)
 				printf("APPEND : %s\n", shell->redir->outfile);
 			if (shell->redir->type == DELIMITER)
-				printf("DELIMITER : %s\n", shell->redir->delimiter);
+				printf("DELIMITER : %s : %d\n", shell->redir->delimiter, shell->redir->couts);
 			shell->redir = shell->redir->next;
 		}
 		shell = shell->next;
@@ -29,45 +29,66 @@ void	print_data(t_shell *shell)
 
 int check_edges(char *str)
 {
-	int	i;
-
-	i = 0;
-	while (*str && *str != '\'' && *str != '\"')
-		str++;
-	while (str[i] && str[i] != '\'' && str[i] != '\"')
-		i++;
-	if (str[0] == '\"' && str[i]== '\"')
+	if (str[0] == '\"' && str[ft_strlen(str) - 1] == '\"')
 		return (1);
-	if (str[0] == '\'' && str[i] == '\'')
+	if (str[0] == '\'' && str[ft_strlen(str) - 1] == '\'')
 		return (2);
 	else
 		return (0);
 }
 
+char	*parseword(char *word, char **env)
+{
+	char	*new_word;
+
+	if (check_edges(word) == 1)
+	{
+		new_word = get_value(word, env);
+		new_word = handle_param(new_word, '\"');
+	}
+	else if (check_edges(word) == 2)
+	{
+		new_word = get_value(word, env);
+		new_word = handle_param(new_word, '\'');
+	}
+	else
+	{
+		new_word = get_value(word, env);
+		new_word = handle_param(new_word, '\'');
+		new_word = handle_param(new_word, '\"');
+	}
+	free(word);
+	return (new_word);
+}
+
 void	ft_getnew(char **split, char **env, int i, t_shell **new)
 {
-	while(split[i])
+	char	**tmp;
+	int		j;
+
+	while (split[i])
 	{
-		if (check_edges(split[i]) == 1 && (!count_char(split[i] , ' ')
-			|| (split[i - 1] && !ft_strcmp(split[i - 1], "echo"))))
+		split[i] = parseword(split[i], env);
+		if (!ft_strcmp(split[i], ">"))
+			redi_add_back(&(*new)->redir, new_redir(get_value(split[++i], env), OUTFILE));
+		else if (!ft_strcmp(split[i], "<"))
+			redi_add_back(&(*new)->redir, new_redir(get_value(split[++i], env), INFILE));
+		else if (!ft_strcmp(split[i], "<<"))
+			redi_add_back(&(*new)->redir, new_redir(get_value(split[++i], env), DELIMITER));
+		else if (!ft_strcmp(split[i], ">>"))
+			redi_add_back(&(*new)->redir, new_redir(get_value(split[++i], env), APPEND));
+		else
 		{
-			split[i] = get_value(split[i], env);
-			split[i] = handle_param(split[i] , '\"');
+			if (check_edges(split[i]))
+			{
+				tmp = ft_split(split[i], ' ');
+				j = 0;
+				while (tmp[j])
+					cmd_add_back(&(*new)->cmd, new_cmd(tmp[j++]));
+			}
+			else
+				cmd_add_back(&(*new)->cmd, new_cmd(split[i]));
 		}
-		else if(check_edges(split[i]) == 2 && (!count_char(split[i] , ' ')))
-			split[i] = handle_param(split[i] , '\'');
-		else
-			split[i] = get_value(split[i], env);
-		if(!ft_strcmp(split[i], ">"))
-			redi_add_back(&(*new)->redir, new_redir(split[++i], OUTFILE));
-		else if(!ft_strcmp(split[i], "<"))
-			redi_add_back(&(*new)->redir, new_redir(split[++i], INFILE));
-		else if(!ft_strcmp(split[i], "<<"))
-			redi_add_back(&(*new)->redir, new_redir(split[++i], DELIMITER));
-		else if(!ft_strcmp(split[i], ">>"))
-			redi_add_back(&(*new)->redir, new_redir(split[++i], APPEND));
-		else
-			cmd_add_back(&(*new)->cmd, new_cmd(split[i]));
 		i++;
 	}
 }
@@ -76,6 +97,7 @@ t_shell	*ft_lstnew(char *content, int index, char **env, int pipe)
 {
 	t_shell	*new;
 	char	**split;
+	(void)env;
 	new = malloc(sizeof(t_shell));
 	if (!new)
 		return (NULL);
@@ -90,6 +112,7 @@ t_shell	*ft_lstnew(char *content, int index, char **env, int pipe)
 	new->index = index;
 	new->next = 0;
 	new->cmds = full_cmds(new->cmd);
+	free(split);
 	return (new);
 }
 
@@ -110,38 +133,54 @@ void	ft_lstadd_back(t_shell **lst, t_shell *new)
 	}
 }
 
-void	freedata(t_shell *data)
+void	freedata(t_shell **data)
 {
-	while(data)
+	while(*data)
 	{
-		while (data->cmd)
+		while ((*data)->cmd)
 		{
-			free(data->cmd->cmd);
-			data->cmd = data->cmd->next;
+			free((*data)->cmd->cmd);
+			(*data)->cmd = (*data)->cmd->next;
 		}
-		data = data->next;
+		free((*data)->cmd);
+		while((*data)->redir)
+		{
+			if ((*data)->redir->type == OUTFILE)
+				free((*data)->redir->outfile);
+			if ((*data)->redir->type == INFILE)
+				free((*data)->redir->infile);
+			if ((*data)->redir->type == DELIMITER)
+				free((*data)->redir->delimiter);
+			if ((*data)->redir->type == APPEND)
+				free((*data)->redir->outfile);
+		}
+		free((*data)->redir);
+		(*data) = (*data)->next;
 	}
+	free(*data);
 }
 
-t_shell *parse_line(char *line, char **env)
+t_shell	*parse_line(char *line, char **env)
 {
 	t_shell	*shell;
 	t_shell	*new;
 	char	**args;
 	int		i;
 	int		pipe;
-
+	// (void)env;
+	// (void)pipe;
+	// (void)new;
+	// (void)line;
+	// (void)args;
 	i = -1;
 	shell = 0;
 	args = ft_split_v2(line, '|');
-	if(!args)
+	if (!args)
 		return (0);
-	while(args[++i])
-	{
+	while (args[++i])
 		args[i] = ft_strtrimfree(args[i], " ");
-	}
 	i = -1;
-	while(args[++i])
+	while (args[++i])
 	{
 		pipe = 0;
 		if(args[i + 1])
@@ -150,19 +189,7 @@ t_shell *parse_line(char *line, char **env)
 		ft_lstadd_back(&shell, new);
 	}
 	freedouble(args);
-	return(shell);
-}
-
-int	ft_checkspace(const char *str)
-{
-	int	i;
-
-	i = 0;
-	while (str[i] == ' ' || str[i] == '\t'
-		|| str[i] == '\n' || str[i] == '\v'
-		|| str[i] == '\f' || str[i] == '\r')
-		i++;
-	return (i);
+	return (shell);
 }
 
 void	sigint_handler(int sig) {
@@ -170,7 +197,7 @@ void	sigint_handler(int sig) {
 	{
 		write(1, "\n", 1);
 		rl_on_new_line();
-		//rl_replace_line("", 1);
+		// rl_replace_line("", 1);
 		rl_redisplay();
 	}
 	else if(sig == SIGQUIT)
@@ -181,7 +208,6 @@ void	mini_shell(char **env)
 {
 	char *read;
 	char *line;
-	char *tmp;
 	t_shell *shell;
 	t_env	*ev;
 
@@ -191,21 +217,15 @@ void	mini_shell(char **env)
 		read = readline("\033[0;32mMinishell>> \033[0m");
 		if (!read)
 			exit(0);
-		tmp = ft_strdup(read);
 		add_history(read);
-		read += ft_checkspace(read);
-		if (read[0] && !parse_syntax(tmp, 0))
+		if (read[0] && !parse_syntax(read, 0))
 		{
 			line = parse_read(read);
 			shell = parse_line(line, ev->env);
-			// print_data(shell);
 			execute(shell, ev);
-			free(line);
-			//system("leaks mini_shell");
 		}
 		else if (read[0])
 			printf("syntax error\n");
-		// printf("lol\n");
 	}
 }
 

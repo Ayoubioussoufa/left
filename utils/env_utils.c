@@ -44,11 +44,13 @@ char	*ft_strdup(char *str)
 	dup[i] = '\0';
 	return (dup);
 }
+
 char	*ft_substr(char *s, int start, int len)
 {
 	char	*res;
 	int		i;
 	int		j;
+
 	if (!s)
 		return (0);
 	if (len >= ft_strlen(s) - start)
@@ -64,7 +66,33 @@ char	*ft_substr(char *s, int start, int len)
 	return (res);
 }
 
-int	ft_strchr(char *s, int c)
+char	*ft_substrr(char const *s, unsigned int start, size_t len)
+{
+	char	*substr;
+	size_t	s_len;
+	size_t	i;
+
+	if (!s)
+		return (NULL);
+	s_len = ft_strlen(s);
+	if (start >= s_len)
+		return (ft_strdup(""));
+	if (s_len - start < len)
+		len = s_len - start;
+	substr = (char *)malloc((len + 1) * sizeof(char));
+	if (!substr)
+		return (NULL);
+	i = 0;
+	while (i < len && s[start + i])
+	{
+		substr[i] = s[start + i];
+		i++;
+	}
+	substr[i] = '\0';
+	return (substr);
+}
+
+int	ft_strchr(char const *s, int c)
 {
 	int	i;
 
@@ -78,6 +106,26 @@ int	ft_strchr(char *s, int c)
 		i++;
 	}
 	return (-1);
+}
+
+char	*ft_strtrime(char const *s1, char const *set)
+{
+	size_t	start;
+	size_t	end;
+	char	*trimmed_str;
+
+	if (!s1 || !set)
+		return (NULL);
+	start = 0;
+	while (s1[start] && ft_strchr(set, s1[start]))
+		start++;
+	end = ft_strlen(s1);
+	while (end > start && ft_strchr(set, s1[end - 1]))
+		end--;
+	trimmed_str = ft_substrr(s1, start + 1, end - start - 2);
+	if (!trimmed_str)
+		return (NULL);
+	return (trimmed_str);
 }
 
 char	*ft_strjoinfree(char *s1, char *s2)

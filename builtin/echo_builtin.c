@@ -63,10 +63,10 @@ void	echo(char **str, int pos)
 	end = is_quote(str[pos][strl - 1]);
 	if (end && start)
 		ft_putnstr(str[pos] + 1, -1);
-	else if (end)
-		ft_putnstr(str[pos], -1);
-	else if (start)
-		ft_putstr(str[pos] + 1);
+	// else if (end)
+	// 	ft_putnstr(str[pos], -1);
+	// else if (start)
+	// 	ft_putstr(str[pos] + 1);
 	else
 		ft_putstr(str[pos]);
 }
@@ -96,6 +96,7 @@ int	echo_builtin(char **cmd)
 	int	f = 0;
 	int	i = 1;
 
+	// printf("hh : %s ", cmd[1]);
 	if (!cmd[1])
 	{
 		write(1, "\n", 1);

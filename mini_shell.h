@@ -6,7 +6,7 @@
 /*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 17:36:00 by sben-ela          #+#    #+#             */
-/*   Updated: 2023/03/04 17:15:50 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/05 16:28:29 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,8 +56,8 @@ typedef struct s_fd
 typedef struct redire
 {
 	int		type;
-	char	*infile;// 0 : input
-	char	*outfile; // 1 : out
+	char	*infile;
+	char	*outfile;
 	char	*delimiter;
 	int		couts;
 	struct redire *next;
@@ -82,113 +82,123 @@ typedef	struct	shell
 	int				index;
 }	t_shell;
 
-char **full_cmds(t_cmd *cmd);
-int	cmd_size(t_cmd *cmds);
-// void	execute(t_shell *shell, char ***env);
-void    execute(t_shell *shell, t_env *env);
+//PARSING
+char	**full_cmds(t_cmd *cmd);
+int		cmd_size(t_cmd *cmds);
 char	*ft_strchrr(const char *s, int c);
 char	**ft_split(char const *str, char c);
-void    ft_execute(t_shell *shell, char **env);
-// void    ft_execute(t_shell *shell, char **env,t_fd *fd);
-void	whatever(t_shell *shell, char **env);
 char	*parse_redirect(char *line);
-//utils
-int ft_strcmp(char *s1, char *s2);
-int	handle_couts(t_shell *shell);
-int		ft_strncmp(char *s1, char *s2, unsigned int n);
-// char	*ft_strjoin(char const *s1, char const *s2);
-char	*ft_strjoinfree(char *s1, char *s2);
-char	*ft_strnstr(const char *haystack, const char *needle, size_t len);
-void	ft_putstr_fd(char *s, int fd);
-void	ft_putnstr(char *str, int n);
-int    echo_builtin(char **cmd);
-void	ft_putchar(char c);
-int	ft_isalpha(int c);
-char	*ft_strdup(char *str);
-char	*ft_substr(char *s, int start, int len);
-// char	*ft_substr(char const *s, unsigned int start, size_t len);
-// char	*ft_strdup(const char *source);
-void	redi_add_back(t_redire **lst, t_redire *new);
 t_redire	*redilast(t_redire *lst);
 t_redire	*new_redir(char *content, int type);
-t_cmd	*last_cmd(t_cmd *lst);
-void	cmd_add_back(t_cmd **lst, t_cmd *new);
-t_cmd	*new_cmd(char *content);
-char	**ft_split_v2(char const *str, char c);
-char *parse_read(char *read);
-//env functions
-char	**convert_array(t_env *env);
-void	del_env(t_env *env);
-void	print_env(t_env *env);
-t_env	*create_env(char **tab);
-t_env	*init_env(t_env *env);
-t_env_elem	*new_env_elem(char *line);
-void	add_env_elem(t_env *env, t_env_elem *new);
-t_env_elem	*search_env_elem(t_env *env, char *key);
-void	del_env_elem(t_env *env, t_env_elem *elem);
-char	*expand_env(char *line, char **env);
-char	*get_expanded_value(char **line, char **env);
-char	*search_env_var(char *key, char **env);
-int	ft_isalnum(int c);
-char	*ft_itoa(int n);
-//error
-int	ft_puterr(char *cmd, char *arg, char *msg, int errnum);
-int	ft_perror(char *msg, char *utils);
+void		redi_add_back(t_redire **lst, t_redire *new);
+t_cmd		*last_cmd(t_cmd *lst);
+void		cmd_add_back(t_cmd **lst, t_cmd *new);
+t_cmd		*new_cmd(char *content);
+char 		*parse_read(char *read);
 
-int    ft_strchr(char *s, int c);
-int        ft_strlen(char *str);
-char    **ft_split_v2(char const *str, char c);
-char    *parse_redirect(char *line);
-//util
-int        ft_isalpha(int c);
-int        count_redirect(char *line);
-t_shell    *ft_lstlast(t_shell *lst);
-void    ft_lstadd_back(t_shell **lst, t_shell *new);
-int        count_char(char *str, char c);
-char    *handle_param(char *str, char c);
-int        ft_strncmp(char *s1, char *s2, unsigned int n);
-char    *ft_strjoin(char *left_str, char *buff);
-void    ft_putstr_fd(char *s, int fd);
-int	parse_syntax(char *line, char c);
-int        ft_checkspace(const char *str);
-int        count_single_couts(char *line);
-int        count_double_couts(char *line);
-char    **second_split(char const *s, char c);
-char       *get_value(char *str,char **env);
-int        ft_isalnum(int c);
-char    *ft_strnstr(const char *haystack, const char *needle, size_t len);
-char    *ft_strdup(char *source);
-int handle_pipes(char *line);
-char	*ft_strtrimfree(char *s1, char *set);
-char	*ft_strtrim(char *s1, char *set);
-void    freedouble(char **args);
+// ENV utils
+char		**convert_array(t_env *env);
+void		del_env(t_env *env);
+void		print_env(t_env *env);
+t_env		*create_env(char **tab);
+t_env		*init_env(t_env *env);
+t_env_elem	*new_env_elem(char *line);
+void		add_env_elem(t_env *env, t_env_elem *new);
+t_env_elem	*search_env_elem(t_env *env, char *key);
+void		del_env_elem(t_env *env, t_env_elem *elem);
+char		*expand_env(char *line, char **env);
+char		*get_expanded_value(char **line, char **env);
+char		*search_env_var(char *key, char **env);
+
+// ERROR
+int			ft_puterr(char *cmd, char *arg, char *msg, int errnum);
+int			ft_perror(char *msg, char *utils);
+
+// UTILS
+int 		ft_strcmp(char *s1, char *s2);
+char		*ft_strjoinfree(char *s1, char *s2);
+char		*ft_strnstr(const char *haystack, const char *needle, size_t len);
+void		ft_putstr_fd(char *s, int fd);
+void		ft_putnstr(char *str, int n);
+void		ft_putchar(char c);
+int			ft_isalpha(int c);
+char		*ft_strdup(char *str);
+char		*ft_substr(char *s, int start, int len);
+int			ft_strlen(const char *str);
+char		**ft_split_v2(char const *str, char c);
+int			ft_isalnum(int c);
+char		*ft_itoa(int n);
+int			ft_isalpha(int c);
+int			count_redirect(char *line);
+t_shell		*ft_lstlast(t_shell *lst);
+void		ft_lstadd_back(t_shell **lst, t_shell *new);
+int			count_char(char *str, char c);
+char		*handle_param(char *str, char c);
+int			ft_strncmp(char *s1, char *s2, unsigned int n);
+char		*ft_strjoin(char *left_str, char *buff);
+void		ft_putstr_fd(char *s, int fd);
+int			parse_syntax(char *line, char c);
+int			count_single_couts(char *line);
+int			count_double_couts(char *line);
+char		*get_value(char *str,char **env);
+int			ft_isalnum(int c);
+char		*ft_strnstr(const char *haystack, const char *needle, size_t len);
+char		*ft_strdup(char *source);
+int 		handle_pipes(char *line);
+char		*ft_strtrimfree(char *s1, char *set);
+char		*ft_strtrim(char *s1, char *set);
+void		freedouble(char **args);
+char		*ft_substrr(char const *s, unsigned int start, size_t len);
+int			ft_strchr(char const *s, int c);
+char		*ft_strtrime(char const *s1, char const *set);
+	
+//EXECUTION
+void		execute(t_shell *shell, t_env *env);
+void		parent(t_shell *shell, int fd[2]);
+void		child(t_shell *shell, t_env *env, int fd[2]);
+void		execute_cmd(t_shell *shell, char **env);
+void		dup_close(int *fd1, int fd2);
+int			exec_builtins_execve(t_shell *shell, t_env *env);
+int			ft_lstsize(t_shell *lst);
+void		execute_builtin(t_shell *shell, t_env *env);
+void		ft_which_cmd(char **cmd, t_env *env);
+int			check_builtins(char *cmd);
+void		ft_execute(t_shell *shell, char **env);
+char		**get_paths(char **env, t_shell *shell);
+char		*get_cmd(char **paths, char *cmd);
+void		error(char *str, int n);
+void		check_fd(t_cmd *cmd);
+void		exec_redir(t_redire *redir, t_fd *fd, char **env);
+int			exec_redir_in(char *infile, int *in);
+void		free_paths(char **paths);
+void		here_doc(t_redire *redir, char **env);
 
 // builtin cd
-int	cd_builtin(char **cmd, t_env *env);
-void	set_dir(t_env *ev, char *cwd, char *owd);
+int			cd_builtin(char **cmd, t_env *env);
+void		set_dir(t_env *ev, char *cwd, char *owd);
 
 //builtin echo
-int	echo_builtin(char **cmd);
-void	echo(char **str, int pos);
-void	ft_putstr(char *s);
-void	ft_putchar(char c);
-
+int			echo_builtin(char **cmd);
+void		echo(char **str, int pos);
+void		ft_putstr(char *s);
+void		ft_putchar(char c);
+	
 // builtin env
-int env_builtin(char **cmd, t_env *env);
-
+int			env_builtin(char **cmd, t_env *env);
+	
 // builtin exit
-int exit_builtin(char **cmd, t_env *env);
-
+int			exit_builtin(char **cmd, t_env *env);
+	
 //builtin export
-int     export_builtin(char **cmd, t_env *env);
-// int	export_builtin(char **cmd, char ***ev);
-void	ft_swapelem(t_env_elem *a, t_env_elem *b);
-void	ft_sort(t_env *env);
-void	print_sorted_env(t_env *env);
-void	add_var(t_env *env, char *cmd); //hadchi ghalt f export 
+int			export_builtin(char **cmd, t_env *env);
+void		ft_sort(t_env *env);
+void		print_sorted_env(t_env *env);
+void		add_var(t_env *env, char *cmd);
+	
 //builtin pwd
-int	pwd_builtin(char *cmd);
+int			pwd_builtin(char *cmd);
+	
 //builtin unset
-int	unset_builtin(char **cmd, t_env *env);
+int			unset_builtin(char **cmd, t_env *env);
 
 #endif

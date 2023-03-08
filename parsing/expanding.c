@@ -33,9 +33,13 @@ char *find_value(char *var, char **env)
     {
         value = ft_strnstr(env[i], str, ft_strlen(var) + 1);
         if(value)
+        {
+            free(str);
             return(value + ft_strlen(var) + 1);
+        }
         i++;
     }
+    free(str);
     return(ft_strdup("\n"));
 }
 
@@ -55,6 +59,7 @@ char	*char_join(char *str, char c)
 	}
 	dst[i++] = c;
 	dst[i] = '\0';
+    free(str);
 	return(dst);
 }
 
@@ -74,13 +79,21 @@ char    *get_value(char *str, char **env)
             p = 1;
         if (*str == '$')
         {
-            var = ft_substr(str, 1, getend(str));
-            if(!var[0])
-                value = ft_strdup("$");
+            if (*(str + 1) == '?')
+                value = ft_itoa(status), str++, str++;
             else
-                value = find_value(var, env);
+            {
+                var = ft_substr(str, 1, getend(str));
+                if(!var[0])
+                    value = ft_strdup("$");
+                else
+                    value = find_value(var, env);
+                str += ft_strlen(var) + 1;
+                free(var);
+            }
             string = ft_strjoinfree(string, value);
-            str += ft_strlen(var) + 1;
+            if (!ft_strcmp(value, "\n"))
+                free(value);
         }
         else if (*str == '\'' && p != 1)
         {

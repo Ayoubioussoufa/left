@@ -6,7 +6,7 @@
 /*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 18:28:01 by aybiouss          #+#    #+#             */
-/*   Updated: 2023/03/08 16:33:42 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/08 19:44:42 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,6 +114,30 @@ char	**get_paths(char **env, t_shell *shell)
 	return (NULL);
 }
 
+void	is_directory(char *str, int n)
+{
+	if (str)
+	{
+		ft_putstr_fd(strerror(n), 2);
+		ft_putstr_fd(": ", 2);
+		ft_putstr_fd(str, 2);
+		ft_putstr_fd("\n", 2);
+	}
+	exit(n);
+}
+
+void	if_directory(char *str)
+{
+	if (!opendir(str))
+		return ;
+	ft_putstr_fd("Minishell", 2);
+	ft_putstr_fd(": ", 2);
+	ft_putstr_fd(str, 2);
+	ft_putstr_fd(": is a directory\n", 2);
+	status = 126;
+	exit(126);
+}
+
 void	ft_execute(t_shell *shell, t_env *env)
 {
 	pid_t	pid;
@@ -125,11 +149,13 @@ void	ft_execute(t_shell *shell, t_env *env)
 	{
 		exec_redir(shell);
 		check_fd(shell->cmd);
+		if_directory(shell->cmds[0]);
 		if (check_builtins(shell->cmds[0]) == 1)
 			ft_which_cmd(shell->cmds, env);
 		else
 			execute_cmd(shell, env->env);
 	}
+	printf("%d\n", status);
 	if (shell->cmd->fd.in != 0)
 		close(shell->cmd->fd.in);
 	if (shell->cmd->fd.out != 1)
@@ -311,18 +337,6 @@ void	dup_close(t_fd *fd)
     }
 }
 
-void	is_directory(char *str, int n)
-{
-	if (str)
-	{
-		ft_putstr_fd(strerror(n), 2);
-		ft_putstr_fd(": ", 2);
-		ft_putstr_fd(str, 2);
-		ft_putstr_fd("\n", 2);
-	}
-	exit(n);
-}
-
 void	execute_cmd(t_shell *shell, char **env)
 {
 	char	**paths = NULL;
@@ -337,14 +351,13 @@ void	execute_cmd(t_shell *shell, char **env)
 		ft_putstr_fd(ft_strtrim(shell->cmds[0], "\""), 2);
 		ft_putstr_fd(": Command not found", 2);
 		ft_putstr_fd("\n", 2);
-		global->status = 127;
+		status = 127;
 		exit(127);
 	}
 	if (execve(argv, shell->cmds, env) < 0)
 		error(NULL, errno);
 	else
 	{
-		printf("????\n");
 		is_directory(argv, 126);
 		free(argv);
 		free_paths(paths);

@@ -22,12 +22,12 @@ int	pwd_builtin(char *cmd)
 	if (!dir)
 	{
 		perror("minishell: pwd: ");
-		global->status = EXIT_FAILURE;
+		status = EXIT_FAILURE;
 		return (-1);
 	}
 	printf("%s\n", dir);
-	global->status = EXIT_SUCCESS;
-	return (global->status);
+	status = EXIT_SUCCESS;
+	return (status);
 }
 
 // int	main(int ac, char **av, char **env)

@@ -6,7 +6,7 @@
 /*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 17:36:00 by sben-ela          #+#    #+#             */
-/*   Updated: 2023/03/08 16:07:30 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/08 19:44:42 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,16 +21,22 @@
 #define		APPEND 5
 #define		DELIMITER 4
 #define		CMD 3
+#define		SINGLE_QUOTE 2
+#define		DOUBLE_QUOTE 1
+#define		WITHOUT_QUOTE 0
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<unistd.h>
 #include	<readline/readline.h>
 #include	<readline/history.h>
 #include	<fcntl.h>
-# include <sys/wait.h>
-# include <sys/errno.h>
-# include <string.h>
-#include <signal.h>
+#include	<sys/wait.h>
+#include	<sys/errno.h>
+#include	<string.h>
+#include <dirent.h>
+
+int	status;
+
 typedef struct s_env_elem
 {
 	char				*key;
@@ -72,31 +78,33 @@ typedef	struct cmd
 
 typedef	struct	shell
 {
-	char			**cmds;
-	int				pipe;
 	t_cmd			*cmd;
-	int				type;
 	t_redire		*redir;
-	struct shell	*next;
-	struct shell	*previous;
+	char			**cmds;
 	int				index;
+	int				type;
+	int				pipe;
+	struct shell	*next;
 }	t_shell;
 
-typedef struct s_data
+typedef	struct content
 {
-	int	status;
-}	t_data;
-
-t_data	*global;
+	char	*content;
+	int		quotes;
+}	t_content;
 
 //PARSING
+// t_redire    *new_redir(t_content *content, int type);
+t_redire    *new_redir(t_content *content, int type);
+t_content	*parseword(char *word, char **env);
+void		sigint_handler(int sig);
+t_shell		*parse_line(char *line, char **env);
 char		**full_cmds(t_cmd *cmd);
 int			cmd_size(t_cmd *cmds);
 char		*ft_strchrr(const char *s, int c);
 char		**ft_split(char const *str, char c);
 char		*parse_redirect(char *line);
 t_redire	*redilast(t_redire *lst);
-t_redire	*new_redir(char *content, int type);
 void		redi_add_back(t_redire **lst, t_redire *new);
 t_cmd		*last_cmd(t_cmd *lst);
 void		cmd_add_back(t_cmd **lst, t_cmd *new);
@@ -161,18 +169,18 @@ int			ft_strchr(char const *s, int c);
 char		*ft_strtrime(char const *s1, char const *set);
 	
 //EXECUTION
-void		execute(t_shell *shell, t_env *env);
-void	child(t_shell *shell, t_env *env);
-void	parent(t_shell *shell);
 void	exec_redir(t_shell *shell);
+void		execute(t_shell *shell, t_env *env);
+void	ft_execute(t_shell *shell, t_env *env);
+int	check_builtins(char *cmd);
+int exec_redir_in(char *infile, int *in);
 void		execute_cmd(t_shell *shell, char **env);
-void		dup_close(t_fd *fd);
-int			exec_builtins_execve(t_shell *shell, t_env *env);
+void check_fd(t_cmd *cmd);
 int			ft_lstsize(t_shell *lst);
-void		execute_builtin(t_shell *shell, t_env *env);
+void	dup_close(t_fd *fd);
 void		ft_which_cmd(char **cmd, t_env *env);
 int			check_builtins(char *cmd);
-void	ft_execute(t_shell *shell, t_env *env);
+void	execute_cmd(t_shell *shell, char **env);
 char		**get_paths(char **env, t_shell *shell);
 char		*get_cmd(char **paths, char *cmd);
 void		error(char *str, int n);

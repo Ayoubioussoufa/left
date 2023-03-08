@@ -66,6 +66,7 @@ char *handle_param(char *str, char c)
 		i++;
 	}
 	dst[j] = '\0';
+	free(str);
 	return(dst);
 }
 

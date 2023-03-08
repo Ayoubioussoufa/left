@@ -6,7 +6,7 @@
 /*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:13:14 by aybiouss          #+#    #+#             */
-/*   Updated: 2023/03/08 16:31:27 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/08 19:44:42 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,8 @@ int	cd_builtin(char **cmd, t_env *env)
 	getcwd(cwd, sizeof(cwd));
 	set_dir(env, cwd, owd);
 	env->env = convert_array(env);
-	global->status = EXIT_SUCCESS;
-	return (global->status);
+	status = EXIT_SUCCESS;
+	return (0);
 }
 
 // int	main(int ac, char **av, char **env)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
+/*   By: sben-ela <sben-ela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/23 11:01:50 by sben-ela          #+#    #+#             */
-/*   Updated: 2023/03/05 17:40:19 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/07 13:52:25 by sben-ela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,35 +130,26 @@ int parse_syntax(char *line, char c)
 {
     int i = 0;
     char    *trimmed_line;
-    // char    **splited;
 
-    // splited = ft_split_v2(line, ' ');
     if (handle_pipes(line) || count_single_quotes(line) || count_double_quotes(line))
         return (1);
     trimmed_line = ft_strdup(line);
-    // printf("0 OUT %s\n", trimmed_line);
     if (!count_double_quotes(line))
-        trimmed_line = ft_strtrime(trimmed_line, "\"");
-    // printf("9999 OUT %s\n", trimmed_line);
+        trimmed_line = ft_strtrimfree(trimmed_line, "\"");
     if (count_single_quotes(line))
-        trimmed_line = ft_strtrime(trimmed_line, "\'");
-    // printf("OUT %s\n", trimmed_line);
+        trimmed_line = ft_strtrimfree(trimmed_line, "\'");
     if (parse_redir(trimmed_line, 0))
     {
         free(trimmed_line);
         return (1);
     }
-    // printf("1 OUT %s\n", trimmed_line);
     while (trimmed_line[i])
 	{
-        // printf("IN %s\n", trimmed_line);
         if (trimmed_line[i] == '\'' || trimmed_line[i] == '\"')
 		{
             c = trimmed_line[i];
-            // printf("Character c: %c\n", trimmed_line[i]);
             while (trimmed_line[i] && trimmed_line[i] != c)
                 i++;
-            // printf("Character %c\n", trimmed_line[i]);
         }
         if (trimmed_line[i] == '|')
 		{
@@ -170,7 +161,6 @@ int parse_syntax(char *line, char c)
             }
         }
         i++;
-        // printf("I ; %d\n", i);
     }
     free(trimmed_line);
     return (0);

@@ -126,7 +126,8 @@ int	echo_builtin(char **cmd)
 		else
 			ft_putchar(' ');
 	}
-	return (1);
+	global->status = EXIT_SUCCESS;
+	return (EXIT_SUCCESS);
 }
 
 // \\\\0 and stuff itgado

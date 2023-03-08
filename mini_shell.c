@@ -204,13 +204,24 @@ void	sigint_handler(int sig) {
 			return ;
 }
 
+t_data	*init_glb()
+{
+	t_data	*global;
+
+	global = malloc(sizeof(t_data));
+	global->status = 0;
+	return (global);
+}
+
 void	mini_shell(char **env)
 {
 	char *read;
 	char *line;
 	t_shell *shell;
 	t_env	*ev;
+	t_data	*global;
 
+	global = init_glb();
 	ev = create_env(env);
 	while (1)
 	{

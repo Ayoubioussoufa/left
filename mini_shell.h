@@ -6,7 +6,7 @@
 /*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 17:36:00 by sben-ela          #+#    #+#             */
-/*   Updated: 2023/03/08 12:11:50 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/08 16:07:30 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,13 @@ typedef	struct	shell
 	int				index;
 }	t_shell;
 
+typedef struct s_data
+{
+	int	status;
+}	t_data;
+
+t_data	*global;
+
 //PARSING
 char		**full_cmds(t_cmd *cmd);
 int			cmd_size(t_cmd *cmds);
@@ -155,15 +162,9 @@ char		*ft_strtrime(char const *s1, char const *set);
 	
 //EXECUTION
 void		execute(t_shell *shell, t_env *env);
-// void	parent(t_shell *shell, int fd[2], int last);
-// void	child(t_shell *shell, t_env *env, int fd[2]);
 void	child(t_shell *shell, t_env *env);
 void	parent(t_shell *shell);
 void	exec_redir(t_shell *shell);
-// void		parent(t_shell *shell, int fd[2]);
-// void		child(t_shell *shell, t_env *env, int fd[2]);
-// void	parent(t_shell *shell, int fd_in, int fd_out, int last);
-// void	child(t_shell *shell, t_env *env, int fd_in, int fd_out);
 void		execute_cmd(t_shell *shell, char **env);
 void		dup_close(t_fd *fd);
 int			exec_builtins_execve(t_shell *shell, t_env *env);
@@ -171,12 +172,11 @@ int			ft_lstsize(t_shell *lst);
 void		execute_builtin(t_shell *shell, t_env *env);
 void		ft_which_cmd(char **cmd, t_env *env);
 int			check_builtins(char *cmd);
-void		ft_execute(t_shell *shell, char **env);
+void	ft_execute(t_shell *shell, t_env *env);
 char		**get_paths(char **env, t_shell *shell);
 char		*get_cmd(char **paths, char *cmd);
 void		error(char *str, int n);
 void		check_fd(t_cmd *cmd);
-// void		exec_redir(t_redire *redir, t_fd *fd);
 int			exec_redir_in(char *infile, int *in);
 void		free_paths(char **paths);
 void		here_doc(t_redire *redir, char **env);

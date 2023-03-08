@@ -6,7 +6,7 @@
 /*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 17:36:00 by sben-ela          #+#    #+#             */
-/*   Updated: 2023/03/05 18:04:59 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/08 12:11:50 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@
 # include <sys/wait.h>
 # include <sys/errno.h>
 # include <string.h>
-
+#include <signal.h>
 typedef struct s_env_elem
 {
 	char				*key;
@@ -155,10 +155,17 @@ char		*ft_strtrime(char const *s1, char const *set);
 	
 //EXECUTION
 void		execute(t_shell *shell, t_env *env);
-void		parent(t_shell *shell, int fd[2]);
-void		child(t_shell *shell, t_env *env, int fd[2]);
+// void	parent(t_shell *shell, int fd[2], int last);
+// void	child(t_shell *shell, t_env *env, int fd[2]);
+void	child(t_shell *shell, t_env *env);
+void	parent(t_shell *shell);
+void	exec_redir(t_shell *shell);
+// void		parent(t_shell *shell, int fd[2]);
+// void		child(t_shell *shell, t_env *env, int fd[2]);
+// void	parent(t_shell *shell, int fd_in, int fd_out, int last);
+// void	child(t_shell *shell, t_env *env, int fd_in, int fd_out);
 void		execute_cmd(t_shell *shell, char **env);
-void		dup_close(int *fd1, int fd2);
+void		dup_close(t_fd *fd);
 int			exec_builtins_execve(t_shell *shell, t_env *env);
 int			ft_lstsize(t_shell *lst);
 void		execute_builtin(t_shell *shell, t_env *env);
@@ -169,7 +176,7 @@ char		**get_paths(char **env, t_shell *shell);
 char		*get_cmd(char **paths, char *cmd);
 void		error(char *str, int n);
 void		check_fd(t_cmd *cmd);
-void		exec_redir(t_redire *redir, t_fd *fd);
+// void		exec_redir(t_redire *redir, t_fd *fd);
 int			exec_redir_in(char *infile, int *in);
 void		free_paths(char **paths);
 void		here_doc(t_redire *redir, char **env);

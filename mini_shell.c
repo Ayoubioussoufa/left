@@ -218,15 +218,17 @@ void	mini_shell(char **env)
 		if (!read)
 			exit(0);
 		add_history(read);
-		if (read[0] && !parse_syntax(read, 0))
+		if (read[0])
 		{
-			line = parse_read(read);
-			shell = parse_line(line, ev->env);
-			print_data(shell);
-			// execute(shell, ev);
+			if (!parse_syntax(read, 0))
+			{
+				line = parse_read(read);
+				shell = parse_line(line, ev->env);
+				execute(shell, ev);
+			}
+			else
+				printf("syntax error\n");
 		}
-		else if (read[0])
-			printf("syntax error\n");
 	}
 }
 
@@ -234,7 +236,7 @@ int main(int ac, char **av, char **env)
 {
 	(void)av;
 
-	if(ac != 1)
+	if (ac != 1)
 	{
 		printf("invalid number of argument\n");
 		return(0);

@@ -6,7 +6,7 @@
 /*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/15 13:44:55 by aybiouss          #+#    #+#             */
-/*   Updated: 2023/03/03 14:58:30 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/08 13:43:44 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,10 @@ int env_builtin(char **cmd, t_env *env)
 	else
 	{
 		// status = EXIT_FAILURE;
-		return (ft_perror("minishell: env: Too many arguments.", NULL));
+		ft_putstr_fd("Minishell: env: ", 2);
+		ft_putstr_fd(cmd[1], 2);
+		ft_putstr_fd(": No such file or directory\n", 2);
+		exit(EXIT_FAILURE);
 	}
 	return (1);
 }

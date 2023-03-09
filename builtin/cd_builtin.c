@@ -6,7 +6,7 @@
 /*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:13:14 by aybiouss          #+#    #+#             */
-/*   Updated: 2023/03/08 19:44:42 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/09 12:03:04 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,8 +60,8 @@ int	cd_builtin(char **cmd, t_env *env)
 	}
 	getcwd(cwd, sizeof(cwd));
 	set_dir(env, cwd, owd);
-	env->env = convert_array(env);
 	status = EXIT_SUCCESS;
+	env->env = convert_array(env);
 	return (0);
 }
 

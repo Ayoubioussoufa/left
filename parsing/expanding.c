@@ -80,7 +80,12 @@ char    *get_value(char *str, char **env)
         if (*str == '$')
         {
             if (*(str + 1) == '?')
-                value = ft_itoa(status), str++, str++;
+            {
+                if (status < 256)
+                    value = ft_itoa(status), str++, str++;
+                else
+                    value = ft_itoa(status/256), str++, str++;
+            }
             else
             {
                 var = ft_substr(str, 1, getend(str));

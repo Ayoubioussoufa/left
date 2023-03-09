@@ -6,7 +6,7 @@
 /*   By: aybiouss <aybiouss@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 18:28:01 by aybiouss          #+#    #+#             */
-/*   Updated: 2023/03/08 19:44:42 by aybiouss         ###   ########.fr       */
+/*   Updated: 2023/03/09 13:50:14 by aybiouss         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,12 +155,12 @@ void	ft_execute(t_shell *shell, t_env *env)
 		else
 			execute_cmd(shell, env->env);
 	}
-	printf("%d\n", status);
 	if (shell->cmd->fd.in != 0)
 		close(shell->cmd->fd.in);
 	if (shell->cmd->fd.out != 1)
 		close(shell->cmd->fd.out);
-	waitpid(pid, NULL, 0);
+	waitpid(pid, &status, 0);
+	// printf("%d\n", status);
 }
 
 int	check_builtins(char *cmd)
@@ -346,22 +346,21 @@ void	execute_cmd(t_shell *shell, char **env)
 	argv = get_cmd(paths, shell->cmds[0]);
 	if (!argv)
 	{
+		status = 127;
 		free_paths(paths);
 		ft_putstr_fd("Minishell: ", 2);
 		ft_putstr_fd(ft_strtrim(shell->cmds[0], "\""), 2);
 		ft_putstr_fd(": Command not found", 2);
 		ft_putstr_fd("\n", 2);
-		status = 127;
 		exit(127);
 	}
-	if (execve(argv, shell->cmds, env) < 0)
+	if (execve(argv, shell->cmds, env) == -1)
 		error(NULL, errno);
-	else
-	{
-		is_directory(argv, 126);
-		free(argv);
-		free_paths(paths);
-	}
+	// else
+	// {
+	// 	free(argv);
+	// 	free_paths(paths);
+	// }
 }
 
 void	child(t_shell *shell, t_env *env)
@@ -383,6 +382,26 @@ void	parent(t_shell *shell)
     	close(shell->cmd->fd.in);
     if (shell->cmd->fd.out != STDOUT_FILENO)
         close(shell->cmd->fd.out);
+}
+
+void	waitchilds(void)
+{
+	while (wait(NULL) != -1)
+		;
+	if (WIFEXITED(status));
+   	// 	printf("Child process exited with status %d\n", WEXITSTATUS(status));
+ 	else if (WIFSIGNALED(status))
+		status += 128;
+ 	// else if (WIFSTOPPED(status))
+	// 	printf("Child process stopped due to signal %d\n", WSTOPSIG(status));
+ 	// else if (WIFCONTINUED(status))
+   	// 	printf("Child process continued\n");
+	// if (WIFEXITED(status))
+    //     printf("Child process exited with status %d\n", WEXITSTATUS(status));
+	// if (status > 256)
+	// 	printf("status after %d\n", status / 256);
+	// else
+	// printf("status after %d\n", status);
 }
 
 void	execute(t_shell *shell, t_env *env)
@@ -413,6 +432,5 @@ void	execute(t_shell *shell, t_env *env)
 	}
 	if (shell)
 		ft_execute(shell, env);
-	while (wait(NULL) != -1)
-		;
+	waitchilds();
 }

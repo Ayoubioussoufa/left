@@ -239,7 +239,7 @@ char	*search_env_var(char *key, char **env)
 
 	i = 0;
 	if (!ft_strcmp(key, "?"))
-		return (ft_itoa(1));//status latest exit
+		return (ft_itoa(status));//status latest exit
 	while (env[i] && ft_strncmp(env[i], key, ft_strlen(key)))
 		i++;
 	if (!env[i])
